@@ -19,7 +19,7 @@ class Raw(object):
 
         Methods:
         get_level   -- get the level of the designated actuator
-        set_level   -- set the level of the designated actuator, is must exist
+        set_level   -- set the level of an existing actuator (between 0 and 100)
         get_orientation
         set_orientation
         get_position
@@ -45,11 +45,20 @@ class Raw(object):
             self.levels[actuator] = 0
 
     def get_level(self, actuator):
+        """Get the level of the designated actuator"""
         if (actuator not in self.actuators):
             raise Exception('Actuator does not exist')
         return self.levels[actuator]
 
     def set_level(self, actuator, level):
+        """
+            Set the level of the designated actuator
+
+            Raises exception if:
+            * actuator is not in self.actuators
+            * level is not an integer
+            * level is not between 0 and 100
+        """
         if (actuator not in self.actuators):
             raise Exception('Actuator does not exist')
         try:
@@ -61,9 +70,17 @@ class Raw(object):
         self.levels[actuator] = level
 
     def get_orientation(self):
+        """Returns the last registered orientation"""
         return self.orientation
 
     def set_orientation(self, orientation):
+        """
+            Set the orientation
+
+            Raises exception if:
+            * orientation is not a number
+            * orientation is not between 0 and 360
+        """
         try:
             if (orientation < 0 or orientation > 360):
                 raise Exception('Wrong orientation')
@@ -72,13 +89,17 @@ class Raw(object):
         self.orientation = orientation
 
     def get_position(self):
+        """Returns the last registered position"""
         return self.position
 
     def set_position(self, point):
+        """Set the position, no control over input"""
         self.position = point
 
     def is_pressed(self):
+        """Returns main actuator pressure state"""
         return self.isPressed
 
     def set_pressed(self, value):
+        """Set the main actuator pressure state, no control over input"""
         self.isPressed = value
