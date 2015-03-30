@@ -10,6 +10,8 @@ Requisites
 * Pytest (install with pip: pip install pytest)
 * Pytest cov (install with pip: pip install pytest-cov)
 
+`Python <http://www.python.org/>`_
+
 Testing
 -------
 
