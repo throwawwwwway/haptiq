@@ -11,6 +11,7 @@ docs/locale/
 tests/coverage_html/
 tests/.coverage
 build/
+.coverage
 
 ## OS related
 
