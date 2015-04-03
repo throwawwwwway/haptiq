@@ -1,14 +1,20 @@
 import threading
 import time
 import tkinter as tk
+import conf
 
 from pattern import Oscilate
-from raw import Raw
-from raw import Point
+from network import NetworkBehavior, Behavior, Node
+from raw import Raw, Point, Actuator
 
 
 def init_raw():
-    return Raw(['actA', 'actB', 'actC', 'actD'])
+    conf.logger.info('Init raw')
+    north = Actuator(90, 'North')
+    est = Actuator(0, 'Est')
+    south = Actuator(270, 'South')
+    west = Actuator(180, 'West')
+    return Raw([north, est, south, west])
 
 
 def motion(event, raw):
@@ -23,10 +29,11 @@ def haptiq_simulator(raw):
 
 
 def network_behavior(raw):
-    pattern = Oscilate()
+    center_node = Node(Point(50, 50))
+    center_behavior = Behavior(center_node, Oscilate(), 10)
+    net_behavior = NetworkBehavior([center_behavior])
     while 1:
-        point = raw.get_position()
-        print("level should be now: " + str(pattern.next_level()))
+        net_behavior.trigger_on(raw)
         time.sleep(3)
 
 raw = init_raw()

@@ -1,3 +1,6 @@
+import conf
+
+
 class Point:
     """ Point class represents and manipulates x,y coords. """
 
@@ -5,6 +8,15 @@ class Point:
         """Create a new point with x and y, by default 0, 0"""
         self.x = x
         self.y = y
+
+
+class Actuator:
+
+    def __init__(self, ortt, name='unknwon'):
+        self.orientation = ortt
+        self.name = name
+
+        conf.logger.debug("Act {} for {}° created".format(name, str(ortt)))
 
 
 class Raw(object):
@@ -18,8 +30,8 @@ class Raw(object):
         isPressed   -- the main input state
 
         Methods:
-        get_level   -- get the level of the designated actuator
-        set_level   -- set the level of an existing actuator (between 0 and 100)
+        get_level  -- get the level of the designated actuator
+        set_level  -- set the level of an existing actuator (between 0 and 100)
         get_orientation
         set_orientation
         get_position
@@ -59,6 +71,7 @@ class Raw(object):
             * level is not an integer
             * level is not between 0 and 100
         """
+        conf.logger.debug('Setting level {} on {}'.format(level, actuator.name))
         if (actuator not in self.actuators):
             raise Exception('Actuator does not exist')
         try:
@@ -103,3 +116,15 @@ class Raw(object):
     def set_pressed(self, value):
         """Set the main actuator pressure state, no control over input"""
         self.isPressed = value
+
+    def get_state(self):
+        state = {'position': self.get_position()}
+        point = state['position']
+        conf.logger.debug("Position is: ({}, {})".format(point.x, point.y))
+        return state
+
+    def set_level_on_direction(self, direction, level):
+        conf.logger.debug('Setting level {} on {}'.format(level, direction))
+        for actuator in self.actuators:
+            if actuator.orientation == direction:
+                self.set_level(actuator, level)
