@@ -12,11 +12,12 @@ class Point:
 
 class Actuator:
 
-    def __init__(self, ortt, name='unknwon'):
-        self.orientation = ortt
+    def __init__(self, orientation, name='unknwon'):
+        self.orientation = orientation
         self.name = name
 
-        conf.logger.debug("Act {} for {}° created".format(name, str(ortt)))
+        conf.logger.debug(
+            "Act {} for {}° created".format(name, str(orientation)))
 
 
 class Raw(object):
@@ -59,6 +60,10 @@ class Raw(object):
     def get_level(self, actuator):
         """Get the level of the designated actuator"""
         if (actuator not in self.actuators):
+            for act in self.actuators:
+                if act.name == actuator:
+                    actuator = act
+        if (actuator not in self.actuators):
             raise Exception('Actuator does not exist')
         return self.levels[actuator]
 
@@ -71,7 +76,8 @@ class Raw(object):
             * level is not an integer
             * level is not between 0 and 100
         """
-        conf.logger.debug('Setting level {} on {}'.format(level, actuator.name))
+        conf.logger.debug(
+            'Setting level {} on {}'.format(level, actuator.name))
         if (actuator not in self.actuators):
             raise Exception('Actuator does not exist')
         try:
