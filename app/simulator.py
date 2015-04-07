@@ -11,7 +11,7 @@ def motion(event, raw):
 
 def color_from_level(level):
     factor = level * 255 / 100
-    return '#%02x%02x%02x' % (factor, 250, 250 - factor)
+    return '#%02x%02x%02x' % (factor, 250, 255 - factor)
 
 
 class HaptiqSimulator(object):
