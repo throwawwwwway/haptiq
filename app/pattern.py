@@ -28,7 +28,7 @@ class Oscilate(Pattern):
 
     def __init__(self, directions=[0, 90, 180, 270]):
         # min_level=0, top_level=100, steps=50,
-        seq = list(range(0, 101, 33))
+        seq = list(range(0, 100, 9))
         r_seq = list(seq)
         r_seq.reverse()
         r_seq.pop(0)

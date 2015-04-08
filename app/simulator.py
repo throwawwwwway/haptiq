@@ -3,6 +3,8 @@ import conf
 from tkinter import Canvas
 from raw import Point
 
+color_classes = ["#fff", "#ffffcc", "#ffeda0", "#fed976", "#feb24c", "#fd8d3c", "#fc4e2a", "#e31a1c", "#bd0026", "#800026"]
+
 
 def motion(event, raw):
     x, y = event.x, event.y
@@ -10,16 +12,20 @@ def motion(event, raw):
 
 
 def color_from_level(level):
-    factor = level * 255 / 100
-    return '#%02x%02x%02x' % (factor, 250, 255 - factor)
+    if level > 99:
+        level = 99
+        conf.logger.warning("Bad level: {}".format(level))
+    return color_classes[int(level / 10)]
 
 
 class HaptiqSimulator(object):
 
     def __init__(self, raw):
-        root = tk.Tk()
-        self.exploration = Explore(root, raw)
-        root.mainloop()
+        self.root = tk.Tk()
+        self.exploration = Explore(self.root, raw)
+
+    def loop(self):
+        self.root.mainloop()
 
 
 class Explore(object):
@@ -40,7 +46,8 @@ class Explore(object):
 
     def new_window(self):
         self.newWindow = tk.Toplevel(self.master)
-        self.app = Feedback(self.newWindow, self.raw)
+        app = Feedback(self.newWindow, self.raw)
+        app.update()
 
     def update(self):
         pass
@@ -57,9 +64,6 @@ class Feedback(object):
         self.quitButton = tk.Button(
             self.frame, text='Quit', width=25, command=self.close_windows)
         self.quitButton.pack()
-        self.button2 = tk.Button(
-            self.frame, text='Update', width=25, command=self.update_simulator)
-        self.button2.pack()
 
         self.canvas = Canvas(master, width=250, height=250)
         self.canvas.pack()
@@ -87,7 +91,7 @@ class Feedback(object):
 
         self.frame.pack()
 
-    def update_simulator(self):
+    def update(self):
         conf.logger.info("Updating simulator")
         self.canvas.itemconfig(
             self.north, fill=color_from_level(self.raw.get_level('North')))
@@ -97,6 +101,7 @@ class Feedback(object):
             self.south, fill=color_from_level(self.raw.get_level('South')))
         self.canvas.itemconfig(
             self.west, fill=color_from_level(self.raw.get_level('West')))
+        self.master.after(100, self.update)
 
     def close_windows(self):
         self.master.destroy()

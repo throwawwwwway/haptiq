@@ -25,14 +25,17 @@ def network_behavior(raw):
     net_behavior = NetworkBehavior([center_behavior])
     while 1:
         net_behavior.trigger_on(raw)
-        time.sleep(1)
+        time.sleep(0.1)
 
 
 raw = init_raw()    # Get the instance of our raw interface
 
-# Launch the network behavior in another thread
-simu = threading.Thread(target=network_behavior, args=(raw,))
-simu.start()
-
 # Launch the simulator in the current thread
-HaptiqSimulator(raw)
+simulator = HaptiqSimulator(raw)
+
+# Launch the network behavior in another thread
+network_behavior = threading.Thread(target=network_behavior, args=(raw,))
+network_behavior.start()
+
+# Loop the simulator
+simulator.loop()
