@@ -21,11 +21,9 @@ def color_from_level(level):
 class HaptiqSimulator(object):
 
     def __init__(self, raw):
-        self.root = tk.Tk()
-        self.exploration = Explore(self.root, raw)
-
-    def loop(self):
-        self.root.mainloop()
+        root = tk.Tk()
+        exploration = Explore(root, raw)
+        root.mainloop()
 
 
 class Explore(object):
@@ -101,7 +99,7 @@ class Feedback(object):
             self.south, fill=color_from_level(self.raw.get_level('South')))
         self.canvas.itemconfig(
             self.west, fill=color_from_level(self.raw.get_level('West')))
-        self.master.after(100, self.update)
+        self.master.after(50, self.update)
 
     def close_windows(self):
         self.master.destroy()

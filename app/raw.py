@@ -134,3 +134,7 @@ class Raw(object):
         for actuator in self.actuators:
             if actuator.orientation == direction:
                 self.set_level(actuator, level)
+
+    def reset_levels(self):
+        for actuator in self.actuators:
+            self.set_level(actuator, 0)

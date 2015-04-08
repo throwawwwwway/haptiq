@@ -12,9 +12,8 @@ class MPattern(object):
 
 class Pattern(object):
 
-    def __init__(self, sequence=[], directions=[]):
+    def __init__(self, sequence=[]):
         self.sequence = sequence
-        self.directions = directions
         self.cursor = 0
 
     def next_level(self):
@@ -26,7 +25,7 @@ class Pattern(object):
 
 class Oscilate(Pattern):
 
-    def __init__(self, directions=[0, 90, 180, 270]):
+    def __init__(self):
         # min_level=0, top_level=100, steps=50,
         seq = list(range(0, 100, 9))
         r_seq = list(seq)
@@ -34,4 +33,4 @@ class Oscilate(Pattern):
         r_seq.pop(0)
         r_seq.pop(-1)
 
-        super().__init__(seq + r_seq, directions)
+        super().__init__(seq + r_seq)

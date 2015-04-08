@@ -10,6 +10,7 @@ class NetworkBehavior(object):
 
     def trigger_on(self, raw):
         conf.logger.info('NetworkBehavior triggered')
+        raw.reset_levels()
         for behavior in self.behaviors:
             if behavior.is_valid(raw.get_state()):
                 behavior.trigger_on(raw)
@@ -38,10 +39,10 @@ class Behavior(object):
 
 class Link(object):
 
-    def __init__(self, node, edon):
+    def __init__(self, node, edon, orientations=[]):
         self.node = node
         self.edon = edon
-        self.orientation = 0
+        self.orientations = orientations
 
     def get_nodes(self):
         return [self.node, self.edon]
@@ -49,9 +50,9 @@ class Link(object):
 
 class Node(object):
 
-    def __init__(self, point):
+    def __init__(self, point, orientations=[0, 90, 180, 270]):
         self.point = point
-        self.orientations = [0, 90, 180, 270]
+        self.orientations = orientations
         conf.logger.debug("Point created ({}, {})".format(point.x, point.y))
 
     def get_distance_from(self, point):
