@@ -1,4 +1,4 @@
-import conf
+import app.conf as cf
 
 
 class MPattern(object):
@@ -19,7 +19,7 @@ class Pattern(object):
     def next_level(self):
         level = self.sequence[self.cursor]
         self.cursor = (self.cursor + 1) % len(self.sequence)
-        conf.logger.debug('Pattern returns {} for next level'.format(level))
+        cf.logger.debug('Pattern returns {} for next level'.format(level))
         return level
 
 

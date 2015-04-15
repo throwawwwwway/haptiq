@@ -1,66 +1,52 @@
 import threading
 import time
 import conf
-# import sys
-# import signal
 
-from pattern import Pattern, Oscilate
-from network import NetworkBehavior, Behavior, Node
-from raw import Raw, Point, Actuator
+from network import Network, Node, Link
+from raw import Raw, Actuator
 from simulator import HaptiqSimulator
 
 
 def init_raw():
     conf.logger.info('Init raw')
     north = Actuator(90, 'North')
-    est = Actuator(0, 'East')
+    east = Actuator(0, 'East')
     south = Actuator(270, 'South')
     west = Actuator(180, 'West')
-    return Raw([north, est, south, west])
+    return Raw([east, north, west, south])
 
 
-def simple_point():
-    center_node = Node(Point(50, 50))
-    center_behavior = Behavior(center_node, Oscilate(), 10)
-    net_behavior = NetworkBehavior([center_behavior])
-    return net_behavior
+def triangle_network():
+    node_a = Node(100, 100)
+    node_b = Node(400, 200)
+    node_c = Node(200, 400)
+    node_e = Node(200, 200)
+    node_f = Node(450, 450)
 
+    link_1 = Link(node_a, node_b)
+    link_2 = Link(node_b, node_c)
+    link_3 = Link(node_c, node_a)
 
-def cool_network():
-    bhs = []
-    weak = Pattern([50, 0])
-    strong = Pattern([90])
-
-    nodes = []
-    nodes.append(Node(Point(20, 30), [90, 0, 270]))
-    nodes.append(Node(Point(50, 10), [180, 270, 0]))
-    nodes.append(Node(Point(80, 30), [90, 180, 270]))
-    nodes.append(Node(Point(50, 50), [0, 90, 180]))
-    nodes.append(Node(Point(80, 80), [90, 180, 270]))
-    nodes.append(Node(Point(50, 100), [0, 90, 180]))
-    nodes.append(Node(Point(20, 80), [0, 270]))
-
-    for node in nodes:
-        bhs.append(Behavior(node, weak, 10))
-        bhs.append(Behavior(node, strong, 5))
-
-    return NetworkBehavior(bhs)
+    return Network(
+        [node_a, node_b, node_c, node_e, node_f],
+        [link_1, link_2, link_3]
+    )
 
 
 def network_behavior(raw, network):
     while 1:
-        net_behavior.trigger_on(raw)
-        time.sleep(0.1)
+        network.trigger_behavior()
+        time.sleep(0.05)
 
 
 raw = init_raw()    # Get the instance of our raw interface
 
-
-net_behavior = cool_network()
+network = triangle_network()
+network.raw = raw
 
 # Launch the network behavior in another thread
-network_behavior = threading.Thread(
-    target=network_behavior, args=(raw, net_behavior,))
-network_behavior.start()
+network_thread = threading.Thread(
+    target=network_behavior, args=(raw, network,))
+network_thread.start()
 
-HaptiqSimulator(raw)  # Launch the simulator in the current thread
+HaptiqSimulator(raw, network)  # Launch the simulator in the current thread
