@@ -1,4 +1,3 @@
-import conf as cf
 import math
 
 from behavior import Behavior, NodeBehavior, LinkBehavior, Context
@@ -49,24 +48,26 @@ class Network(object):
             if (context == Context.on):
                 actuators = self.raw.actuators
             else:
-                actuators = [self.raw.get_actuator_for_angle(coord['angle'])]
+                actuators = [self.raw.actuator_for_angle(coord['angle'])]
             self.nodes_behavior[node].update_if_necessary(
                 context, actuators, coord)
-            # cf.logger.debug(actuators)
-            # cf.logger.debug("[node {}] angle: {}, distance: {}".format(
-            #     str(node), str(coord['angle']), str(coord['distance'])))
-            # cf.logger.debug("Context is: {}".format(str(context)))
-            # Update the behavior if the context has changed from last time
-            # behavior = self.behavior_from_nodes[actuator]
-            # behavior.update_if_necessary(coord)
 
-        # for link in self.links:
-        #     coord = link.closest_point_coord(self.raw.position)
-        #     # link direction not needed -> perpendicular of coord['angle']
-        #     actuator = self.raw.get_actuator_for_angle(coord['angle'])
-        #     # Update the corresponding behavior
-        #     behavior = self.behavior_from_links[actuator]
-        #     behavior.update_if_necessary(coord)
+        for link in list(self.links_behavior.keys()):
+            coord = link.closest_point_coord(self.raw.position)
+            context = which_context(coord['distance'])
+
+            if (context != Context.on):  # Get the direction towards link
+                actuators = [
+                    self.raw.actuator_for_angle(coord['angle'])
+                ]
+            else:   # Get the directions offered by the link
+                actuators = [
+                    self.raw.actuator_for_angle(direction)
+                    for direction in link.directions(self.raw.position)
+                ]
+
+            self.links_behavior[link].update_if_necessary(
+                context, actuators, coord)
 
 
 class Line(object):
@@ -117,6 +118,14 @@ class Link(Line):
         closest_point = self.get_intersection_point(perpendicular)
         return closest_point.polar_coord_of(point)
 
+    def directions(self, point):
+        directions = []
+        if point._distance_to(self.first) > 10:
+            directions.append(self.first._angle_with(self.sec))
+        elif point._distance_to(self.sec) > 10:
+            directions.append(self.sec._angle_with(self.first))
+        return directions
+
 
 class Point(object):
     """ Point class represents and manipulates x, y coords. """
@@ -147,7 +156,7 @@ class Point(object):
     def _angle_with(self, point, distance=None):
         # Using this formula cos(a) = opp/hyp
         opposite = self.y - point.y
-        hypot = self.get_distance_to(point) if distance is None else distance
+        hypot = self._distance_to(point) if distance is None else distance
         if (opposite == 0 or hypot == 0):
             return 0
         angle = math.degrees(math.acos(opposite / hypot))

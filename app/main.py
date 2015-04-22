@@ -9,15 +9,25 @@ from simulator import HaptiqSimulator
 
 def init_raw():
     conf.logger.info('Init raw')
-    north = Actuator(90, 'North')
     east = Actuator(0, 'East')
-    south = Actuator(270, 'South')
+    north = Actuator(90, 'North')
     west = Actuator(180, 'West')
-    # north_east = Actuator(45, 'North-East')
-    # north_west = Actuator(135, 'North-West')
-    # south_west = Actuator(225, 'South-West')
-    # south_east = Actuator(315, 'South-East')
+    south = Actuator(270, 'South')
     return Raw([east, north, west, south])
+
+
+def init_raw_8():
+    conf.logger.info('Init raw 8 Actuators')
+    east = Actuator(0, 'East')
+    north_east = Actuator(45, 'North-East')
+    north = Actuator(90, 'North')
+    north_west = Actuator(135, 'North-West')
+    west = Actuator(180, 'West')
+    south_west = Actuator(225, 'South-West')
+    south = Actuator(270, 'South')
+    south_east = Actuator(315, 'South-East')
+
+    return Raw([east, north_east, north, north_west, west, south_west, south, south_east])
 
 
 def triangle_network(raw):
@@ -55,11 +65,11 @@ def network_behavior(raw, network):
         time.sleep(0.1)
 
 
-raw = init_raw()    # Get the instance of our raw interface
+raw = init_raw_8()    # Get the instance of our raw interface
 
-# network = triangle_network(raw)
+network = triangle_network(raw)
 # network = test_network_one_point(raw)
-network = test_network_two_points(raw)
+# network = test_network_two_points(raw)
 
 # Launch the network behavior in another thread
 network_thread = threading.Thread(

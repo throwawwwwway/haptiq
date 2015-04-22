@@ -29,7 +29,7 @@ class Actuator(object):
         if (not isinstance(level, int) and not isinstance(level, float)):
             raise Exception('level should be int or float')
         elif (level < 0 or level > 100):
-            raise Exception('level should be an int between 0 and 100')
+            cf.logger.warning('level should be an int between 0 and 100')
         self._level = level
 
 
@@ -66,11 +66,11 @@ class Raw(object):
         # else:
         #     self.mouse_moved = False
 
-    def get_actuator_for_angle(self, angle):
+    def actuator_for_angle(self, angle):
         angle = (angle + 180) % 360
         std_angle = self.actuators[1].angle - self.actuators[0].angle
         for actuator in self.actuators:
-            if abs(angle - actuator.angle) < (std_angle / 2):
+            if abs(angle - actuator.angle) <= (std_angle / 2):
                 return actuator
         return self.actuators[0]  # angle must be near 360 -> East
 
