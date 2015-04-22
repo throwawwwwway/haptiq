@@ -3,7 +3,7 @@ import time
 import conf
 
 from network import Network, Node, Link
-from raw import Raw, Actuator
+from raw import Raw, Actuator, Button
 from simulator import HaptiqSimulator
 
 
@@ -26,8 +26,26 @@ def init_raw_8():
     south_west = Actuator(225, 'South-West')
     south = Actuator(270, 'South')
     south_east = Actuator(315, 'South-East')
+    return Raw([
+        east, north_east, north, north_west,
+        west, south_west, south, south_east])
 
-    return Raw([east, north_east, north, north_west, west, south_west, south, south_east])
+
+def init_raw_9():
+    conf.logger.info('Init raw 8 Actuators')
+    east = Actuator(0, 'East')
+    north_east = Actuator(45, 'North-East')
+    north = Actuator(90, 'North')
+    north_west = Actuator(135, 'North-West')
+    west = Actuator(180, 'West')
+    south_west = Actuator(225, 'South-West')
+    south = Actuator(270, 'South')
+    south_east = Actuator(315, 'South-East')
+    button = Button('center')
+    return Raw([
+        east, north_east, north, north_west,
+        west, south_west, south, south_east],
+        button)
 
 
 def triangle_network(raw):
@@ -65,7 +83,7 @@ def network_behavior(raw, network):
         time.sleep(0.1)
 
 
-raw = init_raw_8()    # Get the instance of our raw interface
+raw = init_raw_9()    # Get the instance of our raw interface
 
 network = triangle_network(raw)
 # network = test_network_one_point(raw)

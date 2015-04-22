@@ -122,7 +122,7 @@ class Link(Line):
         directions = []
         if point._distance_to(self.first) > 10:
             directions.append(self.first._angle_with(self.sec))
-        elif point._distance_to(self.sec) > 10:
+        if point._distance_to(self.sec) > 10:
             directions.append(self.sec._angle_with(self.first))
         return directions
 

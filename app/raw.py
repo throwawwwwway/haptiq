@@ -3,16 +3,11 @@ import conf as cf
 from network import Point
 
 
-class Actuator(object):
-    """ Actuator class represents the different actuators of the HaptiQ. """
+class Haptiq(object):
 
-    def __init__(self, angle=None, name='unknwon', level=0):
-        self.angle = angle
+    def __init__(self, name, level):
         self.name = name
         self._level = level
-
-        cf.logger.debug("Actuator {} for {}° created - {}".format(
-            name, str(angle), str(level)))
 
     def __str__(self):
         return "{}: {}".format(self.name, str(self.level))
@@ -33,12 +28,28 @@ class Actuator(object):
         self._level = level
 
 
+class Actuator(Haptiq):
+    """ Actuator class represents the different actuators of the HaptiQ. """
+
+    def __init__(self, angle=None, name='actuator', level=0):
+        self.angle = angle
+        super().__init__(name, level)
+        cf.logger.debug("Actuator {} for {}° created - {}".format(
+            name, str(angle), str(level)))
+
+
+class Button(Haptiq):
+
+    def __init__(self, name='button', level=50):
+        super().__init__(name, level)
+
+
 class Raw(object):
     """
         Raw is the interface that will communicate with the HaptiQ.
     """
 
-    def __init__(self, actuators=()):
+    def __init__(self, actuators=(), button=None):
         """
             Initialize a Raw interface with:
             actuautors at level 0
@@ -51,6 +62,7 @@ class Raw(object):
         self._position = Point(0, 0)
         self.mouse_moved = False
         self.isPressed = False
+        self.button = button
 
     @property
     def position(self):

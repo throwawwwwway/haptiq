@@ -59,7 +59,7 @@ class NodeBehavior(Behavior):
 
 
 class LinkBehavior(Behavior):
-    on = 20
+    on = 30
 
     def __init__(self):
         super().__init__()

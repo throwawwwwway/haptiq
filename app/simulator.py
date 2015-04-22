@@ -77,40 +77,58 @@ class Feedback(object):
 
         self.canvas = Canvas(master, width=250, height=250)
         self.canvas.pack()
-        cntr_x = 250 / 2
-        cntr_y = 250 / 2
-        straight = 90
-        diag = straight * 0.75
-        width = 8
-        self.north = self.canvas.create_line(
-            cntr_x, cntr_y - 8, cntr_x, cntr_y - straight, width=width)
-        self.east = self.canvas.create_line(
-            cntr_x + 8, cntr_y, cntr_x + straight, cntr_y, width=width)
-        self.south = self.canvas.create_line(
-            cntr_x, cntr_y + 8, cntr_x, cntr_y + straight, width=width)
-        self.west = self.canvas.create_line(
-            cntr_x - 8, cntr_y, cntr_x - straight, cntr_y, width=width)
-        self.north_east = self.canvas.create_line(
-            cntr_x + 8, cntr_y - 8, cntr_x + diag, cntr_y - diag, width=width)
-        self.south_east = self.canvas.create_line(
-            cntr_x + 8, cntr_y + 8, cntr_x + diag, cntr_y + diag, width=width)
-        self.south_west = self.canvas.create_line(
-            cntr_x - 8, cntr_y + 8, cntr_x - diag, cntr_y + diag, width=width)
-        self.north_west = self.canvas.create_line(
-            cntr_x - 8, cntr_y - 8, cntr_x - diag, cntr_y - diag, width=width)
-        self.mapped_actuators = {
-            self.raw.actuators[0]: self.east,
-            self.raw.actuators[1]: self.north_east,
-            self.raw.actuators[2]: self.north,
-            self.raw.actuators[3]: self.north_west,
-            self.raw.actuators[4]: self.west,
-            self.raw.actuators[5]: self.south_west,
-            self.raw.actuators[6]: self.south,
-            self.raw.actuators[7]: self.south_east
-        }
+        self.set_mapping()
         cf.logger.debug("Raw actuators: {}".format(self.raw.actuators))
 
         self.frame.pack()
+
+    def set_mapping(self):
+        cntr_x = 250 / 2
+        cntr_y = 250 / 2
+        straight = 90
+        wd = 8
+
+        self.north = self.canvas.create_line(
+            cntr_x, cntr_y - 8, cntr_x, cntr_y - straight, width=wd)
+        self.east = self.canvas.create_line(
+            cntr_x + 8, cntr_y, cntr_x + straight, cntr_y, width=wd)
+        self.south = self.canvas.create_line(
+            cntr_x, cntr_y + 8, cntr_x, cntr_y + straight, width=wd)
+        self.west = self.canvas.create_line(
+            cntr_x - 8, cntr_y, cntr_x - straight, cntr_y, width=wd)
+
+        if len(self.raw.actuators) == 8:
+            diag = straight * 0.75
+            self.north_east = self.canvas.create_line(
+                cntr_x + 8, cntr_y - 8, cntr_x + diag, cntr_y - diag, width=wd)
+            self.south_east = self.canvas.create_line(
+                cntr_x + 8, cntr_y + 8, cntr_x + diag, cntr_y + diag, width=wd)
+            self.south_west = self.canvas.create_line(
+                cntr_x - 8, cntr_y + 8, cntr_x - diag, cntr_y + diag, width=wd)
+            self.north_west = self.canvas.create_line(
+                cntr_x - 8, cntr_y - 8, cntr_x - diag, cntr_y - diag, width=wd)
+            self.mapped_actuators = {
+                self.raw.actuators[0]: self.east,
+                self.raw.actuators[1]: self.north_east,
+                self.raw.actuators[2]: self.north,
+                self.raw.actuators[3]: self.north_west,
+                self.raw.actuators[4]: self.west,
+                self.raw.actuators[5]: self.south_west,
+                self.raw.actuators[6]: self.south,
+                self.raw.actuators[7]: self.south_east
+            }
+        else:
+            self.mapped_actuators = {
+                self.raw.actuators[0]: self.east,
+                self.raw.actuators[1]: self.north,
+                self.raw.actuators[2]: self.west,
+                self.raw.actuators[3]: self.south,
+            }
+
+        if self.raw.button is not None:
+            self.center = self.canvas.create_oval(
+                cntr_x - 10, cntr_y - 10, cntr_x + 10, cntr_y + 10)
+            self.mapped_actuators[self.raw.button] = self.center
 
     def update(self):
         for actuator in self.mapped_actuators:
