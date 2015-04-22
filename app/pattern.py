@@ -1,4 +1,4 @@
-import app.conf as cf
+import conf as cf
 
 
 class MPattern(object):

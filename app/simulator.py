@@ -1,5 +1,5 @@
 import tkinter as tk
-# import conf as cf
+import conf as cf
 
 from tkinter import Canvas
 from raw import Point
@@ -11,7 +11,7 @@ def motion(event, raw):
 
 
 def color_from_level(level):
-    '''return a hex blue depth color depending on the level'''
+    '''return a hex black depth color depending on the level'''
     intensity = 255 - int(level * 2.55) % 256
     return '#%02x%02x%02x' % (intensity, intensity, intensity)
 
@@ -36,12 +36,17 @@ class Explore(object):
         self.explore_canvas = Canvas(master, width=500, height=500)
         self.explore_canvas.pack()
 
-        if (network is not None and False):  # let's draw
-            for node in network.nodes:
-                pos_x = node.point.x - 5
-                pos_y = node.point.y - 5
+        if (network is not None):  # let's draw
+            for node in list(network.nodes_behavior.keys()):
+                pos_x = node.x - 5
+                pos_y = node.y - 5
                 self.explore_canvas.create_oval(
                     pos_x, pos_y, pos_x + 10, pos_y + 10, fill="blue")
+            for link in list(network.links_behavior.keys()):
+                pt_a = link.first
+                pt_b = link.sec
+                self.explore_canvas.create_line(
+                    pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
         self.explore_canvas.bind(
             '<Motion>', lambda event, raw=raw: motion(event, raw))
@@ -85,21 +90,25 @@ class Feedback(object):
             cntr_x, cntr_y + 8, cntr_x, cntr_y + straight, width=width)
         self.west = self.canvas.create_line(
             cntr_x - 8, cntr_y, cntr_x - straight, cntr_y, width=width)
-
+        # self.north_east = self.canvas.create_line(
+        #     cntr_x + 8, cntr_y - 8, cntr_x + diag, cntr_y - diag, width=width)
+        # self.south_east = self.canvas.create_line(
+        #     cntr_x + 8, cntr_y + 8, cntr_x + diag, cntr_y + diag, width=width)
+        # self.south_west = self.canvas.create_line(
+        #     cntr_x - 8, cntr_y + 8, cntr_x - diag, cntr_y + diag, width=width)
+        # self.north_west = self.canvas.create_line(
+        #     cntr_x - 8, cntr_y - 8, cntr_x - diag, cntr_y - diag, width=width)
         self.mapped_actuators = {
             self.raw.actuators[0]: self.east,
+            # self.raw.actuators[4]: self.north_east,
             self.raw.actuators[1]: self.north,
+            # self.raw.actuators[5]: self.north_west,
             self.raw.actuators[2]: self.west,
-            self.raw.actuators[3]: self.south
+            # self.raw.actuators[6]: self.south_west,
+            self.raw.actuators[3]: self.south,
+            # self.raw.actuators[7]: self.south_east
         }
-        # self.north_east = self.canvas.create_line(
-        #     cntr_x + 8, cntr_y - 8, cntr_x + diag,cntr_y - diag, width=width)
-        # self.south_east = self.canvas.create_line(
-        #     cntr_x + 8, cntr_y + 8, cntr_x + diag,cntr_y + diag, width=width)
-        # self.south_west = self.canvas.create_line(
-        #     cntr_x - 8, cntr_y + 8, cntr_x - diag,cntr_y + diag, width=width)
-        # self.north_west = self.canvas.create_line(
-        #     cntr_x - 8, cntr_y - 8, cntr_x - diag,cntr_y - diag, width=width)
+        cf.logger.debug("Raw actuators: {}".format(self.raw.actuators))
 
         self.frame.pack()
 
@@ -107,7 +116,7 @@ class Feedback(object):
         for actuator in self.mapped_actuators:
             self.canvas.itemconfig(
                 self.mapped_actuators[actuator],
-                fill=color_from_level(self.raw.get_level(actuator)))
+                fill=color_from_level(actuator.level))
 
         self.master.after(50, self.update)
 

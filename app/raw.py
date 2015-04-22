@@ -1,44 +1,44 @@
 import conf as cf
 
-
-class Point(object):
-    """ Point class represents and manipulates x,y coords. """
-
-    def __init__(self, x=0, y=0):
-        """Create a new point with x and y, by default 0, 0"""
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return "({}, {})".format(str(self.x), str(self.y))
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
+from network import Point
 
 
 class Actuator(object):
     """ Actuator class represents the different actuators of the HaptiQ. """
 
-    def __init__(self, angle, name='unknwon'):
+    def __init__(self, angle=None, name='unknwon', level=0):
         self.angle = angle
         self.name = name
+        self._level = level
 
-        cf.logger.debug(
-            "Actuator {} for {}° created".format(name, str(angle)))
+        cf.logger.debug("Actuator {} for {}° created - {}".format(
+            name, str(angle), str(level)))
 
     def __str__(self):
-        return self.name
+        return "{}: {}".format(self.name, str(self.level))
+
+    def __gt__(self, other):
+        return self.level > other.level
+
+    @property
+    def level(self):
+        return self._level
+
+    @level.setter
+    def level(self, level):
+        if (not isinstance(level, int) and not isinstance(level, float)):
+            raise Exception('level should be int or float')
+        elif (level < 0 or level > 100):
+            raise Exception('level should be an int between 0 and 100')
+        self._level = level
 
 
 class Raw(object):
     """
         Raw is the interface that will communicate with the HaptiQ.
     """
-    ON_NODE = 20
-    OUTRANGE_NODE = 100
-    CODED_LEVEL_LIMIT = 75
 
-    def __init__(self, actuators=[]):
+    def __init__(self, actuators=()):
         """
             Initialize a Raw interface with:
             actuautors at level 0
@@ -48,46 +48,34 @@ class Raw(object):
         """
         self.actuators = actuators
         self.angle = 90  # North
-        self.position = Point(0, 0)
+        self._position = Point(0, 0)
+        self.mouse_moved = False
         self.isPressed = False
-        self.levels = {}
-        for actuator in actuators:
-            self.levels[actuator] = 0
 
-    def get_level(self, actuator):
-        """Get the level of the designated actuator"""
-        if (actuator in self.actuators):
-            return self.levels[actuator]
-        else:
-            raise Exception('Actuator does not exist')
+    @property
+    def position(self):
+        return self._position
 
-    def set_level(self, actuator, level):
-        """
-            Set the level of the designated actuator
+    @position.setter
+    def position(self, value):
+        self.mouse_moved = True
+        self._position = value
+        # if (value._distance_to(self._position) > 3):
+        #     self.mouse_moved = True
+        #     self._position = value
+        # else:
+        #     self.mouse_moved = False
 
-            Raises exception if:
-            * actuator is not in self.actuators
-            * level is not an integer
-            * level is not between 0 and 100
-        """
-        if (actuator in self.actuators):
-            if (not isinstance(level, int) and not isinstance(level, float)):
-                raise Exception('level should be int or float')
-            elif (level < 0 or level > 100):
-                raise Exception('level should be an int between 0 and 100')
-            self.levels[actuator] = level
-        else:
-            raise Exception('Actuator does not exist')
+    def get_actuator_for_angle(self, angle):
+        angle = (angle + 180) % 360
+        std_angle = self.actuators[1].angle - self.actuators[0].angle
+        for actuator in self.actuators:
+            if abs(angle - actuator.angle) < (std_angle / 2):
+                return actuator
+        return self.actuators[0]  # angle must be near 360 -> East
 
-    def get_state(self):
-        """Returns the current state of the HaptiQ"""
-        return {
-            'position': self.position,
-            'angle': self.angle
-        }
-
-    def get_actuators_interval(self, angle):
-        angle = angle % 360
+    def get_interval_actuators_for_angle(self, angle):
+        angle = (angle + 180) % 360
         lw_actuator = None
         lw_min_delta = 360
         # for everything near and below 360
@@ -108,26 +96,6 @@ class Raw(object):
         else:
             return [lw_actuator, hi_actuator]
 
-    def get_levels_for_coding(self, angle, distance):
-        """ Returns levels from 0 to CODED_LEVEL_LIMIT with their actuators """
-        # import pdb; pdb.set_trace()
-        if (distance > Raw.OUTRANGE_NODE):
-            return {}
-        angle = (angle + 180) % 360
-        interval = self.get_actuators_interval(angle)
-        limit = Raw.CODED_LEVEL_LIMIT
-        coded_level = (Raw.OUTRANGE_NODE - distance) * limit / Raw.OUTRANGE_NODE
-
-        if len(interval) == 1:
-            return {interval[0]: coded_level}
-        else:
-            actuators_marge = (interval[1].angle - interval[0].angle) % 360
-            ratio = (angle - interval[0].angle) / actuators_marge
-            return {
-                interval[0]: (1. - ratio) * coded_level,
-                interval[1]: ratio * coded_level
-            }
-
     def set_all_at(self, level):
         for actuator in self.actuators:
-            self.set_level(actuator, level)
+            actuator.level = level

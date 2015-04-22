@@ -1,61 +1,171 @@
-import math
 import conf as cf
+import math
 
-from raw import Point
+from behavior import Behavior, NodeBehavior, LinkBehavior, Context
+
+
+def which_context(distance):
+    if (distance < 10):
+        return Context.on
+    if (distance < 40):
+        return Context.hot
+    elif (distance < 70):
+        return Context.lukewarm
+    elif (distance < 100):
+        return Context.cold
+    return Context.outrange
 
 
 class Network(object):
-    ON_NODE = 15
-    NEAR_NODE = 100
 
     def __init__(self, nodes=[], links=[], raw=None):
-        self.nodes = nodes
-        self.links = links
         self.raw = raw
+        self.nodes_behavior = {}
+        self.links_behavior = {}
+        for node in nodes:
+            self.nodes_behavior[node] = NodeBehavior()
+        for link in links:
+            self.links_behavior[link] = LinkBehavior()
 
-    def trigger_behavior(self):
-        cur_state = self.raw.get_state()
-        coded_levels = {}
-        for node in self.nodes:
-            distance = node.get_distance_to(cur_state['position'])
-            angle = node.get_angle_with(cur_state['position'])
-            cf.logger.info("Distance: {}, Angle: {}°".format(distance, angle))
-            if (distance <= Network.ON_NODE):
-                self.raw.set_all_at(100)
-                break
-            self.raw.set_all_at(0)
-            if (distance <= Network.NEAR_NODE):
-                #  will indicate the orientation
-                coded_levels = self.raw.get_levels_for_coding(angle, distance)
-            for actuator in coded_levels:
-                self.raw.set_level(actuator, coded_levels[actuator])
+    def apply_behaviors(self):
+        """
+            Apply the behavior for each node and link.
+            The behavior can be an oscillation or a constant.
+        """
+        self.raw.set_all_at(Behavior.default)
+        for node in self.nodes_behavior:
+            self.nodes_behavior[node].apply()
+        for link in self.links_behavior:
+            self.links_behavior[link].apply()
+        Behavior._iter += 1
+
+    def update_behaviors(self):
+        """Update the behaviors"""
+
+        for node in list(self.nodes_behavior.keys()):
+            coord = node.polar_coord_of(self.raw.position)
+            context = which_context(coord['distance'])
+
+            if (context == Context.on):
+                actuators = self.raw.actuators
+            else:
+                actuators = [self.raw.get_actuator_for_angle(coord['angle'])]
+            self.nodes_behavior[node].update_if_necessary(
+                context, actuators, coord)
+            # cf.logger.debug(actuators)
+            # cf.logger.debug("[node {}] angle: {}, distance: {}".format(
+            #     str(node), str(coord['angle']), str(coord['distance'])))
+            # cf.logger.debug("Context is: {}".format(str(context)))
+            # Update the behavior if the context has changed from last time
+            # behavior = self.behavior_from_nodes[actuator]
+            # behavior.update_if_necessary(coord)
+
+        # for link in self.links:
+        #     coord = link.closest_point_coord(self.raw.position)
+        #     # link direction not needed -> perpendicular of coord['angle']
+        #     actuator = self.raw.get_actuator_for_angle(coord['angle'])
+        #     # Update the corresponding behavior
+        #     behavior = self.behavior_from_links[actuator]
+        #     behavior.update_if_necessary(coord)
 
 
-class Link(object):
+class Line(object):
 
-    def __init__(self, node, edon):
-        self.node = node
-        self.edon = edon
+    def __init__(self, pt=[0, 0], vector=[0, 0]):
+        self.pt = pt
+        self.vector = vector
+
+    def get_y(self, x):
+        return (self.vector[1] / self.vector[0]) * (x - self.pt.x) + self.pt.y
+
+    def get_x(self, y):
+        return self.pt.x - (self.vector[0] / self.vector[1]) * (self.pt.y - y)
+
+    def get_perpendicular(self, pt):
+        return Line(pt, [self.vector[1], - self.vector[0]])
+
+    def get_intersection_point(self, line):
+        pt_a = self.pt
+        a = self.vector[0]
+        b = self.vector[1]
+
+        pt_b = line.pt
+        u = line.vector[0]
+        v = line.vector[1]
+
+        part_result = pt_b.y - pt_a.y + (b / a) * (pt_a.x - pt_b.x)
+        lb = part_result * (a / (b * u - a * v))
+
+        return Point(
+            pt_b.x + lb * u,
+            pt_b.y + lb * v)
 
 
-class Node(object):
+class Link(Line):
 
-    def __init__(self, x, y):
-        self.point = Point(x, y)
-        cf.logger.debug("Point created ({}, {})".format(x, y))
+    def __init__(self, node_a, node_b):
+        if node_a.x <= node_b.x:
+            self.first, self.sec = node_a, node_b
+        else:
+            self.first, self.sec = node_b, node_a
 
-    def get_distance_to(self, point):
-        sq_dist_x = (self.point.x - point.x) ** 2
-        sq_dist_y = (self.point.y - point.y) ** 2
+        vector = [self.sec.x - self.first.x, self.sec.y - self.first.y]
+        super().__init__(self.first, vector)
+
+    def closest_point_coord(self, point):
+        perpendicular = self.get_perpendicular(point)
+        closest_point = self.get_intersection_point(perpendicular)
+        return closest_point.polar_coord_of(point)
+
+
+class Point(object):
+    """ Point class represents and manipulates x, y coords. """
+
+    def __init__(self, x=0, y=0):
+        """Create a new point with x and y, by default 0, 0"""
+        self.x = x
+        self.y = y
+
+    def __str__(self):
+        return "POINT ({} {})".format(str(self.x), str(self.y))
+
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
+
+    def polar_coord_of(self, position):
+        distance = self._distance_to(position)
+        return {
+            'angle': self._angle_with(position, distance),
+            'distance': distance
+        }
+
+    def _distance_to(self, point):
+        sq_dist_x = (self.x - point.x) ** 2
+        sq_dist_y = (self.y - point.y) ** 2
         return math.sqrt(sq_dist_x + sq_dist_y)
 
-    def get_angle_with(self, point):
+    def _angle_with(self, point, distance=None):
         # Using this formula cos(a) = opp/hyp
-        opposite = self.point.y - point.y
-        hypotenuse = self.get_distance_to(point)
-        if (opposite == 0 or hypotenuse == 0):
+        opposite = self.y - point.y
+        hypot = self.get_distance_to(point) if distance is None else distance
+        if (opposite == 0 or hypot == 0):
             return 0
-        angle = math.degrees(math.acos(opposite / hypotenuse))
+        angle = math.degrees(math.acos(opposite / hypot))
         # Enable full circle angles
-        angle = angle if point.x < self.point.x else 360 - angle
+        angle = angle if point.x < self.x else 360 - angle
         return (angle + 90) % 360  # rotation needed
+
+
+class Node(Point):
+
+    def __init__(self, x, y):
+        super().__init__(x, y)
+
+    def __str__(self):
+        return "NODE ({} {})".format(self.x, self.y)
+
+    def __hash__(self):
+        return hash(self.__key())
+
+    def __key(self):
+        return tuple(v for k, v in sorted(self.__dict__.items()))
