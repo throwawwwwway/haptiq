@@ -1,54 +1,54 @@
 +-------+
-|		|
-|	+	|
-|		|
+|       |
+|   +   |
+|       |
 +-------+
 
 Void:
-	- all actuators set to a constant (0)
-	- basic oscilation
+    - all actuators set to a constant (0)
+    - basic oscilation
 
 
 +-------+
-|o		|
-|	+   |
-|		|
+|o      |
+|   +   |
+|       |
 +-------+
 
 Close to one node:
-	- actuators indicate direction
-	- actuators oscilate to indicate direction
+    - actuators indicate direction
+    - actuators oscilate to indicate direction
 
 
 +-------+
-|	o	|
-|	+   |
-|o		|
+|   o   |
+|   +   |
+|o      |
 +-------+
 
 Close to more than one node:
-	- sequence the information for each node
+    - sequence the information for each node
 
 
 +-------+
-|		|
-|	*	|
-|		|
+|       |
+|   *   |
+|       |
 +-------+
 
 On a node:
-	- blunt pattern
-	- pattern of the node, before information
+    - blunt pattern
+    - pattern of the node, before information
 
 
 +-------+
 |      o|
-|	*	|
-|		|
+|   *   |
+|       |
 +-------+
 
 On a node and close to another:
-	- 
+    - 
 
 
 
