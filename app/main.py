@@ -1,10 +1,13 @@
 import threading
 import time
 import conf
+import sys
+import liblo
 
-from network import Network, Node, Link
+from network import Network, Node, Link, Point
 from raw import Raw, Actuator, Button
 from simulator import HaptiqSimulator
+from py3tuio.main import TuioServer
 
 
 def init_raw():
@@ -83,6 +86,25 @@ def network_behavior(raw, network):
         time.sleep(0.1)
 
 
+def tuio(raw):
+    try:
+        server = TuioServer(8080)
+    except liblo.ServerError as err:
+        sys.exit(str(err))
+    server.start()
+    while (True):
+        time.sleep(0.1)
+        try:
+            cursor = server.main_cursor()
+            if cursor is not None:
+                print("Cursor is at ({}, {})".format(
+                    str(cursor.x * 500), str(cursor.y * 500)))
+                raw.position = Point(cursor.x * 500, cursor.y * 500)
+        except:
+            server.stop()
+            raise
+
+
 raw = init_raw_9()    # Get the instance of our raw interface
 
 network = triangle_network(raw)
@@ -92,6 +114,9 @@ network = triangle_network(raw)
 # Launch the network behavior in another thread
 network_thread = threading.Thread(
     target=network_behavior, args=(raw, network,))
+tuio_thread = threading.Thread(target=tuio, args=(raw,))
+
 network_thread.start()
+tuio_thread.start()
 
 HaptiqSimulator(raw, network)  # Launch the simulator in the current thread

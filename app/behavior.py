@@ -54,8 +54,8 @@ class NodeBehavior(Behavior):
             self.sequence = gen_oscillation(20, 5)
         elif context == Context.outrange:
             self.sequence = [0]
-        cf.logger.debug("[node] Context is {}, sequence is {}".format(
-            context, str(self.sequence)))
+        # cf.logger.debug("[node] Context is {}, sequence is {}".format(
+        #     context, str(self.sequence)))
 
 
 class LinkBehavior(Behavior):
@@ -75,5 +75,5 @@ class LinkBehavior(Behavior):
             self.sequence = [lvl]
         elif context == Context.outrange:
             self.sequence = [0]
-        cf.logger.debug("[link] Context is {}, sequence is {}".format(
-            context, str(self.sequence)))
+        # cf.logger.debug("[link] Context is {}, sequence is {}".format(
+        #     context, str(self.sequence)))

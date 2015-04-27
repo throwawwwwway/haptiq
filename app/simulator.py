@@ -48,18 +48,29 @@ class Explore(object):
                 self.explore_canvas.create_line(
                     pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
-        self.explore_canvas.bind(
-            '<Motion>', lambda event, raw=raw: motion(event, raw))
+        # self.explore_canvas.bind(
+        #     '<Motion>', lambda event, raw=raw: motion(event, raw))
+
+        self.device_cursor = self.explore_canvas.create_oval(
+            0, 0, 5, 5)
 
         self.frame.pack()
 
     def new_window(self):
         self.newWindow = tk.Toplevel(self.master)
-        app = Feedback(self.newWindow, self.raw)
-        app.update()
+        self.app = Feedback(self.newWindow, self.raw)
+        self.previous = self.raw.position
+        self.update()
 
     def update(self):
-        pass
+        self.explore_canvas.move(
+            self.device_cursor,
+            self.raw.position.x - self.previous.x,
+            self.raw.position.y - self.previous.y)
+        self.previous = self.raw.position
+        if not self.app.closed:
+            self.app.update()
+        self.master.after(50, self.update)
 
 
 class Feedback(object):
@@ -81,6 +92,7 @@ class Feedback(object):
         cf.logger.debug("Raw actuators: {}".format(self.raw.actuators))
 
         self.frame.pack()
+        self.closed = False
 
     def set_mapping(self):
         cntr_x = 250 / 2
@@ -136,7 +148,6 @@ class Feedback(object):
                 self.mapped_actuators[actuator],
                 fill=color_from_level(actuator.level))
 
-        self.master.after(50, self.update)
-
     def close_windows(self):
+        self.closed = True
         self.master.destroy()
