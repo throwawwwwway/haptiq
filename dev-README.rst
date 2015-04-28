@@ -1,10 +1,10 @@
-Documentation for helping other developers
-==========================================
+Development documentation
+=========================
 
 Requisites
 ----------
 
-* Python 2.7 or 3.4
+* Python 3.x
 * Pip (should be installed automatically) `if not <https://pip.pypa.io/en/latest/installing.html>`_
 * Nose	(install with pip: pip install nose)
 * Pytest (install with pip: pip install pytest)
