@@ -6,6 +6,7 @@ from app.network import Network, Node, Link
 from app.raw import Raw, Actuator, Button
 from app.simulator import HaptiqSimulator
 from app.tuio import TuioServer
+from app.handler import PointsHandler
 
 
 def init_raw():
@@ -85,7 +86,8 @@ def network_behavior(raw, network):
 
 
 def tuio(raw):
-    server = TuioServer("0.0.0.0", 3333, raw)
+    handler = PointsHandler(raw)
+    server = TuioServer("0.0.0.0", 3333, handler)
     server.start()
 
 if __name__ == "__main__":

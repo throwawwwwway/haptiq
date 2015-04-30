@@ -31,6 +31,6 @@ In folder, execute
 .. code::
 
   python -m app
- 
+
 
 It might be python.exe for Windows or python3 for some unix systems.
