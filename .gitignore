@@ -1,4 +1,4 @@
-## Python related
+# python related
 
 *.egg-info
 *.pot
@@ -14,7 +14,7 @@ build/
 .coverage
 .Python
 
-	# virtual-env
+# virtual-env
 
 [Bb]in
 [Ii]nclude
@@ -24,33 +24,26 @@ pyvenv.cfg
 pip-selfcheck.json
 
 
-## OS related
+# OS related
 
 .DS_Store
 .AppleDouble
 .LSOverride
 Icon
 ._*
-
-	# Files that might appear in the root of a volume
-
 .DocumentRevisions-V100
 .fseventsd
 .Spotlight-V100
 .TemporaryItems
 .Trashes
 .VolumeIcon.icns
-
-	# Directories potentially created on remote AFP share
-
 .AppleDB
 .AppleDesktop
 Network Trash Folder
 Temporary Items
 .apdisk
 
-
-## Project related
+# Project related
 
 activity.log*
 tmp*
