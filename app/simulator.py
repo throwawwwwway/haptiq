@@ -1,8 +1,8 @@
 import tkinter as tk
-import conf as cf
+import app.conf as cf
 
 from tkinter import Canvas
-from raw import Point
+from app.raw import Point
 
 
 def motion(event, raw):

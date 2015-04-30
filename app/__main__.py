@@ -1,13 +1,11 @@
 import threading
 import time
-import conf
-import sys
-import liblo
+import app.conf as conf
 
-from network import Network, Node, Link, Point
-from raw import Raw, Actuator, Button
-from simulator import HaptiqSimulator
-from py3tuio.main import TuioServer
+from app.network import Network, Node, Link
+from app.raw import Raw, Actuator, Button
+from app.simulator import HaptiqSimulator
+from app.tuio import TuioServer
 
 
 def init_raw():
@@ -87,36 +85,22 @@ def network_behavior(raw, network):
 
 
 def tuio(raw):
-    try:
-        server = TuioServer(8080)
-    except liblo.ServerError as err:
-        sys.exit(str(err))
+    server = TuioServer("0.0.0.0", 3333, raw)
     server.start()
-    while (True):
-        time.sleep(0.1)
-        try:
-            cursor = server.main_cursor()
-            if cursor is not None:
-                print("Cursor is at ({}, {})".format(
-                    str(cursor.x * 500), str(cursor.y * 500)))
-                raw.position = Point(cursor.x * 500, cursor.y * 500)
-        except:
-            server.stop()
-            raise
 
+if __name__ == "__main__":
+    raw = init_raw_9()    # Get the instance of our raw interface
 
-raw = init_raw_9()    # Get the instance of our raw interface
+    network = triangle_network(raw)
+    # network = test_network_one_point(raw)
+    # network = test_network_two_points(raw)
 
-network = triangle_network(raw)
-# network = test_network_one_point(raw)
-# network = test_network_two_points(raw)
+    # Launch the network behavior in another thread
+    network_thread = threading.Thread(
+        target=network_behavior, args=(raw, network,))
+    tuio_thread = threading.Thread(target=tuio, args=(raw,))
 
-# Launch the network behavior in another thread
-network_thread = threading.Thread(
-    target=network_behavior, args=(raw, network,))
-tuio_thread = threading.Thread(target=tuio, args=(raw,))
+    network_thread.start()
+    tuio_thread.start()
 
-network_thread.start()
-tuio_thread.start()
-
-HaptiqSimulator(raw, network)  # Launch the simulator in the current thread
+    HaptiqSimulator(raw, network)  # Launch the simulator in the current thread

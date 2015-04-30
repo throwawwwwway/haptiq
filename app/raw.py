@@ -1,6 +1,6 @@
-import conf as cf
+import app.conf as cf  # noqa
 
-from network import Point
+from app.network import Point  # noqa
 
 
 class Haptiq(object):

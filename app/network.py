@@ -1,6 +1,6 @@
 import math
 
-from behavior import Behavior, NodeBehavior, LinkBehavior, Context
+from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
 
 
 def which_context(distance):
