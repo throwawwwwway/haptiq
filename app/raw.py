@@ -1,6 +1,6 @@
-import app.conf as cf  # noqa
+import app.conf as cf
 
-from app.network import Point  # noqa
+from app.network import Point
 
 
 class Haptiq(object):
@@ -58,7 +58,7 @@ class Raw(object):
             isPressed at False
         """
         self.actuators = actuators
-        self.angle = 90  # North
+        self.orientation = 0
         self._position = Point(0, 0)
         self.mouse_moved = False
         self.isPressed = False
@@ -79,7 +79,7 @@ class Raw(object):
         #     self.mouse_moved = False
 
     def actuator_for_angle(self, angle):
-        angle = (angle + 180) % 360
+        angle = (angle + 180 - self.orientation) % 360
         std_angle = self.actuators[1].angle - self.actuators[0].angle
         for actuator in self.actuators:
             if abs(angle - actuator.angle) <= (std_angle / 2):
@@ -87,7 +87,7 @@ class Raw(object):
         return self.actuators[0]  # angle must be near 360 -> East
 
     def get_interval_actuators_for_angle(self, angle):
-        angle = (angle + 180) % 360
+        angle = (angle + 180 - self.orientation) % 360
         lw_actuator = None
         lw_min_delta = 360
         # for everything near and below 360

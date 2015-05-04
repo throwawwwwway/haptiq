@@ -1,10 +1,21 @@
 import argparse
+import app.conf as cf
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
+from app.handler import PointsHandler
+from app.raw import Raw
 
 
 def interpret_2Dcur(*args):  # noqa
+    """
+        0: '/tui/2Dcur'
+        1: <handler object>
+        2: {set, alive, ...}
+        3: <2Dcur id>
+        4: x pos
+        5: y pos
+    """
     handler = args[1][0]
     if args[2] == 'set':
         cur_id = args[3]
@@ -30,3 +41,10 @@ class TuioServer(object):
 
     def start(self):
         self.server.serve_forever()
+
+
+if __name__ == '__main__':
+    points_handler = PointsHandler(Raw())
+    tuio = TuioServer("0.0.0.0", 3333, points_handler)
+    cf.logger.debug("Tuio Server launched")
+    tuio.start()
