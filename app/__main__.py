@@ -97,7 +97,7 @@ if __name__ == "__main__":
     # network = test_network_one_point(raw)
     # network = test_network_two_points(raw)
 
-    # Launch the network behavior in another thread
+    # Launch the network behavior and the tuio server in separate threads
     network_thread = threading.Thread(
         target=network_behavior, args=(raw, network,))
     tuio_thread = threading.Thread(target=tuio, args=(raw,))

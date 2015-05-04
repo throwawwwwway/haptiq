@@ -4,11 +4,17 @@ import itertools
 
 
 def init_base():
+    """ Corresponds to the CD+cup prototype """
     return {
-        'top': Point(0, 0),
-        'bottom': Point(0, 20),
-        'right': Point(10, 20)
+        'top': Point(0.70447188, 0.39590805),
+        'bottom': Point(0.70798462, 0.81577765),
+        'right': Point(0.82564610, 0.79777598)
     }
+
+
+def almost_equal(i, j, precision=0.1):
+    return (i >= j / (1 + precision) and
+            i <= j * (1 + precision))
 
 
 class PointsHandler(object):
@@ -26,24 +32,32 @@ class PointsHandler(object):
         cf.logger.debug("asking to handle: {} for {}".format(
             str(id), str(Point(x, y))))
         point = Point(x * self.width, y * self.height)
-        # if self.magic_l.get(id) is None:
-        #     if len(self.magic_l) >= 3:
-        #         self.magic_l = {}
-        #     self.magic_l[id] = point
-        # if len(self.magic_l) < 3:
-        #     return
 
-        self.raw.position = point
+        if (self.cur_base.get(id) is None and len(self.cur_base) == 3):
+            self.cur_base = {}
+        self.cur_base[id] = point
 
-    def retrieve_tbr(self, points):
+        if len(self.cur_base) == 3:
+            points = list(self.cur_base.values())
+            tbr = self.eval_tbr(points)
+            self.raw.position = Point(
+                tbr['top']._distance_to(tbr['bottom']),
+                tbr['bottom']._distance_to(tbr['right'])
+            )
+            self.raw.orientation = tbr['bottom']._angle_with(tbr['right'])
+
+    def eval_tbr(self, points):
+        """ Evaluates the top, bottom and right points from the given ones """
         if len(points) != 3:
-            cf.logger.debug("[retrieve_tbr] Not 3 points given")
+            cf.logger.debug("[eval_tbr] Not 3 points given")
             return {}
 
         iter = itertools.permutations(range(3), 3)
         for top, bottom, right in iter:
-            if (points[top]._distance_to(points[bottom]) == self.dist_tb and
-                    points[top]._distance_to(points[right]) == self.dist_tr):
+            d_tb = points[top]._distance_to(points[bottom])
+            d_tr = points[top]._distance_to(points[right])
+            if (almost_equal(d_tb, self.dist_tb) and
+                    almost_equal(d_tr, self.dist_tr)):
                 return {
                     'top': points[top],
                     'bottom': points[bottom],
@@ -51,13 +65,6 @@ class PointsHandler(object):
                 }
         return None
 
-    def compute_angle(self, points):
-        tbr = self.retrieve_tbr(points)
-        return tbr['bottom']._angle_with(tbr['right'])
-
 
 if __name__ == '__main__':
-    pts_handler = PointsHandler()
-    res = pts_handler.compute_angle(
-        [Point(0, 0), Point(-20, 0), Point(-20, 10)])
-    print(str(res))
+    pass

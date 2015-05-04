@@ -58,7 +58,7 @@ class Raw(object):
             isPressed at False
         """
         self.actuators = actuators
-        self.orientation = 0
+        self._orientation = 0
         self._position = Point(0, 0)
         self.mouse_moved = False
         self.isPressed = False
@@ -70,13 +70,17 @@ class Raw(object):
 
     @position.setter
     def position(self, value):
-        self.mouse_moved = True
+        cf.logger.debug("position is now: {}".format(str(value)))
         self._position = value
-        # if (value._distance_to(self._position) > 3):
-        #     self.mouse_moved = True
-        #     self._position = value
-        # else:
-        #     self.mouse_moved = False
+
+    @property
+    def orientation(self):
+        return self._orientation
+
+    @orientation.setter
+    def orientation(self, value):
+        cf.logger.debug("orientation is now: {}".format(str(value)))
+        self._orientation = value
 
     def actuator_for_angle(self, angle):
         angle = (angle + 180 - self.orientation) % 360
