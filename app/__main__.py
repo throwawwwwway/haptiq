@@ -49,6 +49,36 @@ def init_raw_9():
         west, south_west, south, south_east],
         button)
 
+def labyrinth_network(raw):
+    base_x = 100
+    base_y = 150
+    node_a = Node(base_x, base_y)
+    node_b = Node(base_x * 2, base_y)
+    node_c = Node(base_x * 2, base_y * 2)
+    node_d = Node(base_x, base_y * 2)
+    node_e = Node(base_x * 3, base_y)
+    node_f = Node(base_x * 4, base_y * 2)
+    node_g = Node(base_x * 3, base_y * 3)
+    node_h = Node(base_x * 4, base_y * 3)
+    node_i = Node(base_x * 5, base_y * 3)
+
+    links = [
+        Link(node_a, node_b),
+        Link(node_b, node_c),
+        Link(node_d, node_c),       
+        Link(node_e, node_c),       
+        Link(node_b, node_e),       
+        Link(node_e, node_f),       
+        Link(node_f, node_g),       
+        Link(node_h, node_f),       
+        Link(node_h, node_g),
+        Link(node_h, node_i)
+    ]
+    return Network(
+        [node_a, node_b, node_c, node_d, node_e, node_f, node_g, node_h, node_i],
+        links,
+        raw
+    )
 
 def triangle_network(raw):
     node_a = Node(100, 100)
