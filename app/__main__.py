@@ -120,8 +120,7 @@ def test_network_two_points(raw):
 
 def network_behavior(raw, network):
     while 1:
-        if raw.mouse_moved:
-            network.update_behaviors()
+        network.update_behaviors()
         network.apply_behaviors()
         time.sleep(0.1)
 
@@ -137,9 +136,10 @@ def controller(raw):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     while 1:
         for act in enumerate(raw.actuators):
-            msg = "{} {}".format(str(act[0]), str(act[1].level))
-            sock.sendto(bytes(msg, 'UTF-8'), (UDP_IP, UDP_PORT))
-        time.sleep(0.5)
+            if act[1].should_update():
+                msg = "{} {}".format(str(act[0]), str(act[1].level))
+                sock.sendto(bytes(msg, 'UTF-8'), (UDP_IP, UDP_PORT))
+        time.sleep(0.1)
 
 if __name__ == "__main__":
     raw = init_raw_4()    # Get the instance of our raw interface

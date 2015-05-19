@@ -8,6 +8,7 @@ class Haptiq(object):
     def __init__(self, name, level):
         self.name = name
         self._level = level
+        self._previous_level = None
 
     def __str__(self):
         return "{}: {}".format(self.name, str(self.level))
@@ -26,6 +27,12 @@ class Haptiq(object):
         elif (level < 0 or level > 100):
             cf.logger.warning('level should be an int between 0 and 100')
         self._level = level
+
+    def should_update(self):
+        if self._previous_level != self.level:
+            self._previous_level = self.level
+            return True
+        return False
 
 
 class Actuator(Haptiq):

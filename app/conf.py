@@ -20,7 +20,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 # stream to console
 steam_handler = logging.StreamHandler()
-steam_handler.setLevel(logging.DEBUG)
+steam_handler.setLevel(logging.INFO)
 steam_handler.setFormatter(formatter)
 logger.addHandler(steam_handler)
 
