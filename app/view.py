@@ -16,23 +16,25 @@ def color_from_level(level):
     return '#%02x%02x%02x' % (intensity, intensity, intensity)
 
 
-class HaptiqSimulator(object):
-
+class HaptiqView(object):
     def __init__(self, raw, network=None):
         root = tk.Tk()
-        Explore(root, raw, network)
+        Scene(root, raw, network)
         root.mainloop()
 
 
-class Explore(object):
+class Scene(object):
     def __init__(self, master, raw, network=None):
         self.master = master
         self.raw = raw
         self.frame = tk.Frame(self.master)
-        self.button1 = tk.Button(
-            self.frame, text='Open view', width=25, command=self.new_window)
-        self.button1.pack()
-
+        self.buttonFeedback = tk.Button(
+            self.frame,
+            text="Feedback window",
+            width=25,
+            command=self.open_feedback
+        )
+        self.buttonFeedback.pack()
         self.explore_canvas = Canvas(master, width=500, height=500)
         self.explore_canvas.pack()
 
@@ -55,11 +57,8 @@ class Explore(object):
             0, 0, 5, 5)
 
         self.frame.pack()
-
-    def new_window(self):
-        self.newWindow = tk.Toplevel(self.master)
-        self.app = Feedback(self.newWindow, self.raw)
-        self.previous = self.raw.position
+        self.previous = Point(0, 0)
+        self.app = None
         self.update()
 
     def update(self):
@@ -68,9 +67,13 @@ class Explore(object):
             self.raw.position.x - self.previous.x,
             self.raw.position.y - self.previous.y)
         self.previous = self.raw.position
-        if not self.app.closed:
+        if self.app and not self.app.closed:
             self.app.update()
         self.master.after(50, self.update)
+
+    def open_feedback(self):
+        self.feedbackWindow = tk.Toplevel(self.master)
+        self.app = Feedback(self.feedbackWindow, self.raw)
 
 
 class Feedback(object):
@@ -83,7 +86,7 @@ class Feedback(object):
         self.mapped_actuators = {}
 
         self.quitButton = tk.Button(
-            self.frame, text='Quit', width=25, command=self.close_windows)
+            self.frame, text='Quit', width=25, command=self.close_window)
         self.quitButton.pack()
 
         self.canvas = Canvas(master, width=250, height=250)
@@ -148,6 +151,6 @@ class Feedback(object):
                 self.mapped_actuators[actuator],
                 fill=color_from_level(actuator.level))
 
-    def close_windows(self):
+    def close_window(self):
         self.closed = True
         self.master.destroy()

@@ -14,7 +14,6 @@ def interpret_2Dcur(*args):  # noqa
 class TuioServer(object):
 
     def __init__(self, address="0.0.0.0", port=3333, handler=None):
-
         self.handler = handler
         parser = argparse.ArgumentParser()
         parser.add_argument("--ip", default=address)
