@@ -8,7 +8,8 @@ logger = logging.getLogger()
 # setting the lowest loggin level (DEBUG <-> everything)
 logger.setLevel(logging.DEBUG)
 # formating logs
-formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
+# formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
+formatter = logging.Formatter('%(levelname)s :: %(message)s')
 
 # specify file handler in 'append' mode with 1Mo size and backup
 file_handler = RotatingFileHandler('activity.log', 'a', 1000000, 1)
@@ -20,7 +21,7 @@ file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 # stream to console
 steam_handler = logging.StreamHandler()
-steam_handler.setLevel(logging.INFO)
+steam_handler.setLevel(logging.DEBUG)
 steam_handler.setFormatter(formatter)
 logger.addHandler(steam_handler)
 

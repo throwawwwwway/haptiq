@@ -8,7 +8,7 @@ from app.raw import Raw, Actuator, Button
 # from app.simulator import HaptiqSimulator
 from app.view import HaptiqView
 from app.tuio import TuioServer
-from app.handler import PointsHandler
+from app.handler import Handler
 
 
 UDP_IP = "192.168.43.224"
@@ -126,7 +126,7 @@ def network_behavior(raw, network):
 
 
 def tracker(raw):
-    handler = PointsHandler(raw, 1)
+    handler = Handler(raw)
     server = TuioServer("0.0.0.0", 3333, handler)
     server.start()
 
