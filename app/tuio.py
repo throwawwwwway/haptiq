@@ -3,8 +3,9 @@ import app.conf as cf
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
-from app.handler import PointsHandler
+from app.handler import Handler
 from app.raw import Raw
+from app.network import Point
 
 
 def interpret_2Dcur(*args):  # noqa
@@ -15,11 +16,21 @@ def interpret_2Dcur(*args):  # noqa
         3: <2Dcur id>
         4: x pos
         5: y pos
+        6: X direction
+        7 : Y direction
     """
     handler = args[1][0]
-    if args[2] == 'set':
-        cur_id = args[3]
-        handler.manage(cur_id, args[4], args[5])
+    if args[2] == 'alive':
+        points = []
+        i = 3
+        while i < len(args):
+            points.append(args[i])
+            i += 1
+        handler.manage(points)
+    elif args[2] == 'set':
+        handler.points[args[3]] = Point(args[4], args[5])
+    elif args[2] == 'fseq':
+        handler.update_raw()
 
 
 class TuioServer(object):
@@ -43,7 +54,7 @@ class TuioServer(object):
 
 
 if __name__ == '__main__':
-    points_handler = PointsHandler(Raw())
+    points_handler = Handler(Raw())
     tuio = TuioServer("0.0.0.0", 3333, points_handler)
     cf.logger.debug("Tuio Server launched")
     tuio.start()

@@ -1,74 +1,97 @@
 from app.network import Point
 import app.conf as cf
-import itertools
 
 
-def init_base():
-    """ Corresponds to the CD+cup prototype """
-    return {
-        'top': Point(0.70447188, 0.39590805),
-        'bottom': Point(0.70798462, 0.81577765),
-        'right': Point(0.82564610, 0.79777598)
-    }
+def get_triangle(points):
+
+        ab = points[0]._distance_to(points[1])
+        ac = points[0]._distance_to(points[2])
+        bc = points[1]._distance_to(points[2])
+
+        if ab < ac and ab < bc:
+            top, left, right = 2, 0, 1
+        elif ac < ab and ac < bc:
+            top, left, right = 1, 0, 2
+        elif bc < ac and bc < ab:
+            top, left, right = 0, 1, 2
+        else:
+            return None
+
+        return {
+            'top': points[top],
+            'left': points[left],
+            'right': points[right]
+        }
 
 
-def almost_equal(i, j, precision=0.1):
-    return (i >= j / (1 + precision) and
-            i <= j * (1 + precision))
+class Handler(object):
 
-
-class PointsHandler(object):
-
-    def __init__(self, raw, points, width=500, height=500):
+    def __init__(self, raw, width=500, height=500):
         self.raw = raw
         self.width = width
         self.height = height
-        self.points = points
-        self.base = init_base()
-        self.dist_tr = self.base['top']._distance_to(self.base['right'])
-        self.dist_tb = self.base['top']._distance_to(self.base['bottom'])
-        self.dist_rb = self.base['right']._distance_to(self.base['bottom'])
+        self.points = {}
+        self.waiting_update = False
 
-    def manage(self, id, x, y):
-        cf.logger.debug("asking to handle: {} for {}".format(
-            str(id), str(Point(x, y))))
-        point = Point(x * self.width, y * self.height)
-
-        if self.points == 1:
-            self.raw.position = point
+    def update_position(self):
+        n_pts = len(self.points)
+        if n_pts < 1:
             return
+        x, y = 0, 0
+        for pt in self.points.values():
+            x += pt.x
+            y += pt.y
+        self.raw.position = Point(
+            int(x / n_pts * self.width),
+            int(y / n_pts * self.height)
+        )
 
-        if (self.cur_base.get(id) is None and len(self.cur_base) == 3):
-            self.cur_base = {}
-        self.cur_base[id] = point
-
-        if len(self.cur_base) == 3:
-            points = list(self.cur_base.values())
-            tbr = self.eval_tbr(points)
-            self.raw.position = Point(
-                tbr['top']._distance_to(tbr['bottom']),
-                tbr['bottom']._distance_to(tbr['right'])
+    def update_orientation(self):
+        triangle = get_triangle(list(self.points.values()))
+        if triangle is None:
+            cf.logger.debug("Triangle not found")
+        else:
+            middle = Point(
+                (triangle['right'].x + triangle['left'].x) / 2,
+                (triangle['right'].y + triangle['left'].y) / 2,
             )
-            self.raw.orientation = tbr['bottom']._angle_with(tbr['right'])
+            self.raw.orientation = middle._angle_with(triangle['top'])
 
-    def eval_tbr(self, points):
-        """ Evaluates the top, bottom and right points from the given ones """
-        if len(points) != 3:
-            cf.logger.debug("[eval_tbr] Not 3 points given")
-            return {}
+    def manage(self, points):
+        if not self.waiting_update:
+            self.waiting_update = True
+            self.points = {id: Point() for id in points}
 
-        iter = itertools.permutations(range(3), 3)
-        for top, bottom, right in iter:
-            d_tb = points[top]._distance_to(points[bottom])
-            d_tr = points[top]._distance_to(points[right])
-            if (almost_equal(d_tb, self.dist_tb) and
-                    almost_equal(d_tr, self.dist_tr)):
-                return {
-                    'top': points[top],
-                    'bottom': points[bottom],
-                    'right': points[right]
-                }
-        return None
+    def update_raw(self):
+        if self.waiting_update:
+            self.update_position()
+            if len(self.points) == 3:
+                self.update_orientation()
+            self.waiting_update = False
+
+# def manage(self, id, x, y):
+#     # cf.logger.debug("Point {}: ({}, {}) handled".format(
+#     #     str(id), str(x), str(y)))
+#     if len(self.points) == 3 and id not in self.points:
+#         cf.logger.debug("New point")
+#         self.points = {id: Point(x, y)}
+#     else:
+#         self.points[id] = Point(x, y)
+#         self.set_position()
+#         if len(self.points) < 3:
+#             cf.logger.debug("Not enough points")
+#             return
+#         triangle = get_triangle(list(self.points.values()))
+#         if triangle is None:
+#             print("Triangle not found")
+#             for id, pt in self.points.items():
+#                 print("{}: {}".format(id, str(pt)))
+#         else:
+#             middle = Point(
+#                 (triangle['right'].x + triangle['left'].x) / 2,
+#                 (triangle['right'].y + triangle['left'].y) / 2,
+#             )
+#             self.raw.orientation = middle._angle_with(triangle['top'])
 
 
 if __name__ == '__main__':
