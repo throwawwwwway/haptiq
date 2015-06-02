@@ -17,14 +17,14 @@ def color_from_level(level):
 
 
 class HaptiqView(object):
-    def __init__(self, raw, network=None):
+    def __init__(self, raw, network=None, mouse_tracking=False):
         root = tk.Tk()
-        Scene(root, raw, network)
+        Scene(root, raw, network, mouse_tracking)
         root.mainloop()
 
 
 class Scene(object):
-    def __init__(self, master, raw, network=None):
+    def __init__(self, master, raw, network=None, mouse_tracking=False):
         self.master = master
         self.raw = raw
         self.frame = tk.Frame(self.master)
@@ -50,8 +50,9 @@ class Scene(object):
                 self.explore_canvas.create_line(
                     pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
-        # self.explore_canvas.bind(
-        #     '<Motion>', lambda event, raw=raw: motion(event, raw))
+        if mouse_tracking:
+            self.explore_canvas.bind(
+                '<Motion>', lambda event, raw=raw: motion(event, raw))
 
         self.device_cursor = self.explore_canvas.create_oval(
             0, 0, 5, 5)

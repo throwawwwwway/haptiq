@@ -125,7 +125,7 @@ def network_behavior(raw, network):
         time.sleep(0.1)
 
 
-def tracker(raw):
+def tracker(raw, type=None):
     handler = Handler(raw)
     server = TuioServer("0.0.0.0", 3333, handler)
     server.start()
@@ -154,6 +154,6 @@ if __name__ == "__main__":
     behavior_thread.start()
     # tracker_thread.start()
     controller_thread.start()
-    tracker_thread.start()
+    # tracker_thread.start()
 
-    HaptiqView(raw, network)
+    HaptiqView(raw, network, True)  # Last argument is for tracking the mouse
