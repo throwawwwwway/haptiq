@@ -196,9 +196,9 @@ def controller(raw):
 
 if __name__ == "__main__":
     raw = init_raw_9()    # Get the instance of our raw interface
-    # network = triangle_network(raw)
+    network = triangle_network(raw)
     #  network = exp1_network(raw)
-    network = conc1_network(raw)
+    # network = conc1_network(raw)
 
     # Launch the network behavior and the tuio server in separate threads
     behavior_thread = threading.Thread(
@@ -207,8 +207,8 @@ if __name__ == "__main__":
     controller_thread = threading.Thread(target=controller, args=(raw,))
 
     behavior_thread.start()
-    # tracker_thread.start()
+    tracker_thread.start()
     controller_thread.start()
     # tracker_thread.start()
 
-    HaptiqView(raw, network, True)  # Last argument is for tracking the mouse
+    HaptiqView(raw, network, False)  # Last argument is for tracking the mouse

@@ -77,8 +77,9 @@ class Raw(object):
 
     @position.setter
     def position(self, value):
-        # cf.logger.debug("position is now: {}".format(str(value)))
-        self._position = value
+        if value != self._position:
+            cf.logger.debug("position is now: {}".format(str(value)))
+            self._position = value
 
     @property
     def orientation(self):
@@ -86,8 +87,9 @@ class Raw(object):
 
     @orientation.setter
     def orientation(self, value):
-        cf.logger.debug("orientation is now: {}".format(str(value)))
-        self._orientation = value
+        if value != self.orientation:
+            cf.logger.debug("orientation is now: {}".format(str(value)))
+            self._orientation = value
 
     def actuator_for_angle(self, angle):
         angle = (angle + 180 - self.orientation) % 360
