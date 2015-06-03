@@ -167,8 +167,11 @@ class Point(object):
 
 class Node(Point):
 
+    base_x = 25
+    base_y = 25
+
     def __init__(self, x, y):
-        super().__init__(x, y)
+        super().__init__(Node.base_x * x, Node.base_y * y)
 
     def __str__(self):
         return "NODE ({} {})".format(self.x, self.y)

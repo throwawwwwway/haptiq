@@ -56,18 +56,71 @@ def init_raw_9():
         button)
 
 
+def exp1_network(raw):
+    home = Node(5, 8)
+    cinema = Node(8, 7)
+    police = Node(7, 3)
+    market = Node(14, 5)
+    city_hall = Node(15, 10)
+    school = Node(7, 12)
+    tower = Node(3, 15)
+
+    links = [
+        Link(home, cinema),
+        Link(home, police),
+        Link(cinema, police),
+        Link(police, market),
+        Link(market, city_hall),
+        Link(school, city_hall),
+        Link(home, school)
+    ]
+
+    return Network(
+        [home, cinema, police, market, city_hall, school, tower],
+        links,
+        raw
+    )
+
+
+def conc1_network(raw):
+    sophie = Node(6, 2)
+    mathiew = Node(2, 6)
+    jean = Node(10, 6)
+    martin = Node(2, 10)
+    harold = Node(10, 10)
+    helene = Node(14, 10)
+    julie = Node(10, 14)
+    marie = Node(14, 14)
+
+    links = [
+        Link(sophie, mathiew),
+        Link(sophie, jean),
+        Link(jean, mathiew),
+        Link(martin, mathiew),
+        Link(jean, harold),
+        Link(jean, helene),
+        Link(mathiew, harold),
+        Link(harold, julie),
+        Link(helene, marie),
+        Link(julie, marie)
+    ]
+    return Network(
+        [sophie, mathiew, jean, martin, harold, helene, julie, marie],
+        links,
+        raw
+    )
+
+
 def labyrinth_network(raw):
-    base_x = 100
-    base_y = 150
-    node_a = Node(base_x, base_y)
-    node_b = Node(base_x * 2, base_y)
-    node_c = Node(base_x * 2, base_y * 2)
-    node_d = Node(base_x, base_y * 2)
-    node_e = Node(base_x * 3, base_y)
-    node_f = Node(base_x * 4, base_y * 2)
-    node_g = Node(base_x * 3, base_y * 3)
-    node_h = Node(base_x * 4, base_y * 3)
-    node_i = Node(base_x * 5, base_y * 3)
+    node_a = Node(1, 1)
+    node_b = Node(2, 1)
+    node_c = Node(2, 2)
+    node_d = Node(1, 2)
+    node_e = Node(3, 1)
+    node_f = Node(4, 2)
+    node_g = Node(3, 3)
+    node_h = Node(4, 3)
+    node_i = Node(5, 3)
 
     links = [
         Link(node_a, node_b),
@@ -92,11 +145,11 @@ def labyrinth_network(raw):
 
 
 def triangle_network(raw):
-    node_a = Node(100, 100)
-    node_b = Node(400, 200)
-    node_c = Node(200, 400)
-    node_e = Node(200, 200)
-    node_f = Node(450, 450)
+    node_a = Node(1, 1)
+    node_b = Node(4, 2)
+    node_c = Node(2, 4)
+    node_e = Node(2, 2)
+    node_f = Node(4.5, 4.5)
 
     link_1 = Link(node_a, node_b)
     link_2 = Link(node_b, node_c)
@@ -142,8 +195,10 @@ def controller(raw):
         time.sleep(0.1)
 
 if __name__ == "__main__":
-    raw = init_raw_4()    # Get the instance of our raw interface
-    network = triangle_network(raw)
+    raw = init_raw_9()    # Get the instance of our raw interface
+    # network = triangle_network(raw)
+    #  network = exp1_network(raw)
+    network = conc1_network(raw)
 
     # Launch the network behavior and the tuio server in separate threads
     behavior_thread = threading.Thread(
