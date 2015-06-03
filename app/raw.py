@@ -14,7 +14,7 @@ class Haptiq(object):
         return "{}: {}".format(self.name, str(self.level))
 
     def __gt__(self, other):
-        return self.level > other.level
+        return self._level > other._level
 
     @property
     def level(self):
@@ -26,6 +26,7 @@ class Haptiq(object):
             raise Exception('level should be int or float')
         elif (level < 0 or level > 100):
             cf.logger.warning('level should be an int between 0 and 100')
+            level = 0
         self._level = level
 
     def should_update(self):
@@ -53,7 +54,7 @@ class Button(Haptiq):
 
 class Raw(object):
     """
-        Raw is the interface that will communicate with the HaptiQ.
+        Raw is the interface that will serve as an interpret with the HaptiQ.
     """
 
     def __init__(self, actuators=(), button=None):
@@ -98,28 +99,6 @@ class Raw(object):
             if abs(angle - actuator.angle) <= (std_angle / 2):
                 return actuator
         return self.actuators[0]  # angle must be near 360 -> East
-
-    def get_interval_actuators_for_angle(self, angle):
-        angle = (angle + 180 - self.orientation) % 360
-        lw_actuator = None
-        lw_min_delta = 360
-        # for everything near and below 360
-        hi_actuator = self.actuators[0]
-        hi_min_delta = 360
-        cf.logger.debug("Looking for actuator")
-        for actuator in self.actuators:
-            delta = angle - actuator.angle
-            if (delta >= 0 and delta < lw_min_delta):
-                lw_actuator = actuator
-                lw_min_delta = delta
-            delta = actuator.angle - angle
-            if (delta >= 0 and delta < hi_min_delta):
-                hi_actuator = actuator
-                hi_min_delta = delta
-        if lw_actuator == hi_actuator:
-            return [lw_actuator]
-        else:
-            return [lw_actuator, hi_actuator]
 
     def set_all_at(self, level):
         for actuator in self.actuators:

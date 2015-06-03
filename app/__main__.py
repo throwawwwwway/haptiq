@@ -112,15 +112,15 @@ def conc1_network(raw):
 
 
 def labyrinth_network(raw):
-    node_a = Node(1, 1)
-    node_b = Node(2, 1)
-    node_c = Node(2, 2)
-    node_d = Node(1, 2)
-    node_e = Node(3, 1)
-    node_f = Node(4, 2)
-    node_g = Node(3, 3)
-    node_h = Node(4, 3)
-    node_i = Node(5, 3)
+    node_a = Node(3, 3)
+    node_b = Node(6, 3)
+    node_c = Node(6, 6)
+    node_d = Node(3, 6)
+    node_e = Node(9, 3)
+    node_f = Node(12, 6)
+    node_g = Node(9, 9)
+    node_h = Node(12, 9)
+    node_i = Node(15, 9)
 
     links = [
         Link(node_a, node_b),
@@ -145,11 +145,11 @@ def labyrinth_network(raw):
 
 
 def triangle_network(raw):
-    node_a = Node(1, 1)
-    node_b = Node(4, 2)
-    node_c = Node(2, 4)
-    node_e = Node(2, 2)
-    node_f = Node(4.5, 4.5)
+    node_a = Node(3, 3)
+    node_b = Node(12, 6)
+    node_c = Node(6, 12)
+    node_e = Node(6, 6)
+    node_f = Node(14, 14)
 
     link_1 = Link(node_a, node_b)
     link_2 = Link(node_b, node_c)
@@ -207,8 +207,7 @@ if __name__ == "__main__":
     controller_thread = threading.Thread(target=controller, args=(raw,))
 
     behavior_thread.start()
-    tracker_thread.start()
-    controller_thread.start()
     # tracker_thread.start()
+    controller_thread.start()
 
-    HaptiqView(raw, network, False)  # Last argument is for tracking the mouse
+    HaptiqView(raw, network, True)  # Last argument is for tracking the mouse
