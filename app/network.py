@@ -157,7 +157,9 @@ class Point(object):
         # Using this formula cos(a) = opp/hyp
         opposite = self.y - point.y
         hypot = self._distance_to(point) if distance is None else distance
-        if (opposite == 0 or hypot == 0):
+        if (opposite == 0):
+            return 0 if self.x < point.x else 180
+        elif (hypot == 0):
             return 0
         angle = math.degrees(math.acos(opposite / hypot))
         # Enable full circle angles
