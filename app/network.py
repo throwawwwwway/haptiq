@@ -159,7 +159,7 @@ class Point(object):
         hypot = self._distance_to(point) if distance is None else distance
         if (opposite == 0):
             return 0 if self.x < point.x else 180
-        elif (hypot == 0):
+        elif (hypot == 0):  # not tested
             return 0
         angle = math.degrees(math.acos(opposite / hypot))
         # Enable full circle angles
@@ -178,8 +178,8 @@ class Node(Point):
     def __str__(self):
         return "NODE ({} {})".format(self.x, self.y)
 
-    def __hash__(self):
+    def __hash__(self):  # not tested
         return hash(self.__key())
 
-    def __key(self):
+    def __key(self):  # not tested
         return tuple(v for k, v in sorted(self.__dict__.items()))

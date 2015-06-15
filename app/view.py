@@ -1,8 +1,9 @@
 import tkinter as tk
 import app.conf as cf
 
-from tkinter import Canvas
+from tkinter import Canvas, Menu
 from app.raw import Point
+from functools import partial
 
 
 def motion(event, raw):
@@ -17,14 +18,43 @@ def color_from_level(level):
 
 
 class HaptiqView(object):
-    def __init__(self, raw, network=None, mouse_tracking=False):
-        root = tk.Tk()
-        Scene(root, raw, network, mouse_tracking)
-        root.mainloop()
+
+    def __init__(self, raw, networks=None, mouse_tracking=False):
+        self.root = tk.Tk()
+        self.networks = networks
+
+        menubar = Menu(self.root)
+        self.root.config(menu=menubar)
+        filemenu = Menu(menubar)
+        menubar.add_cascade(label="File", menu=filemenu)
+        for key, network in networks.items():
+            network.raw = raw
+            partial_command = partial(self.load_network, key)
+            filemenu.add_command(
+                label=key, command=partial_command)
+        filemenu.add_separator()
+        filemenu.add_command(label="Exit", command=self.on_exit)
+
+        self.scene = Scene(self.root, raw, mouse_tracking)
+        self.load_network(next(iter(networks)))
+
+    def loop(self):
+        self.root.mainloop()
+
+    def load_network(self, network_key):
+        print("load_network called with: " + str(network_key))
+        self.network = self.networks[network_key]
+        self.scene.draw_network(self.network)
+
+    def current_network(self):
+        return self.network
+
+    def on_exit(self):
+        self.root.destroy()
 
 
 class Scene(object):
-    def __init__(self, master, raw, network=None, mouse_tracking=False):
+    def __init__(self, master, raw, mouse_tracking=False):
         self.master = master
         self.raw = raw
         self.frame = tk.Frame(self.master)
@@ -38,29 +68,36 @@ class Scene(object):
         self.explore_canvas = Canvas(master, width=500, height=500)
         self.explore_canvas.pack()
 
-        if (network is not None):  # let's draw
-            for node in list(network.nodes_behavior.keys()):
-                pos_x = node.x - 5
-                pos_y = node.y - 5
-                self.explore_canvas.create_oval(
-                    pos_x, pos_y, pos_x + 10, pos_y + 10, fill="blue")
-            for link in list(network.links_behavior.keys()):
-                pt_a = link.first
-                pt_b = link.sec
-                self.explore_canvas.create_line(
-                    pt_a.x, pt_a.y, pt_b.x, pt_b.y)
-
         if mouse_tracking:
             self.explore_canvas.bind(
                 '<Motion>', lambda event, raw=raw: motion(event, raw))
 
-        self.device_cursor = self.explore_canvas.create_oval(
-            0, 0, 5, 5)
+        self.enable_position_feedback()
+        self.network_drawings = []
 
         self.frame.pack()
         self.previous = Point(0, 0)
         self.app = None
         self.update()
+
+    def enable_position_feedback(self):
+        self.device_cursor = self.explore_canvas.create_oval(
+            self.raw.position.x - 2.5, self.raw.position.y - 2.5, 
+            self.raw.position.x + 2.5, self.raw.position.y + 2.5)
+
+    def draw_network(self, network):
+        self.explore_canvas.delete('all')
+        self.enable_position_feedback()
+        for node in list(network.nodes_behavior.keys()):
+            pos_x = node.x - 5
+            pos_y = node.y - 5
+            self.explore_canvas.create_oval(
+                pos_x, pos_y, pos_x + 10, pos_y + 10, fill="blue")
+        for link in list(network.links_behavior.keys()):
+            pt_a = link.first
+            pt_b = link.sec
+            self.explore_canvas.create_line(
+                pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
     def update(self):
         self.explore_canvas.move(
@@ -89,6 +126,7 @@ class Feedback(object):
         self.quitButton = tk.Button(
             self.frame, text='Quit', width=25, command=self.close_window)
         self.quitButton.pack()
+        self.master.protocol("WM_DELETE_WINDOW", self.close_window)
 
         self.canvas = Canvas(master, width=250, height=250)
         self.canvas.pack()
