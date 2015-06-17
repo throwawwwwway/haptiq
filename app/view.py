@@ -76,13 +76,12 @@ class Scene(object):
         self.network_drawings = []
 
         self.frame.pack()
-        self.previous = Point(0, 0)
         self.app = None
         self.update()
 
     def enable_position_feedback(self):
         self.device_cursor = self.explore_canvas.create_oval(
-            self.raw.position.x - 2.5, self.raw.position.y - 2.5, 
+            self.raw.position.x - 2.5, self.raw.position.y - 2.5,
             self.raw.position.x + 2.5, self.raw.position.y + 2.5)
 
     def draw_network(self, network):
@@ -100,11 +99,12 @@ class Scene(object):
                 pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
     def update(self):
+        coords = self.explore_canvas.coords(self.device_cursor)
+        center = ((coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
         self.explore_canvas.move(
             self.device_cursor,
-            self.raw.position.x - self.previous.x,
-            self.raw.position.y - self.previous.y)
-        self.previous = self.raw.position
+            self.raw.position.x - center[0],
+            self.raw.position.y - center[1])
         if self.app and not self.app.closed:
             self.app.update()
         self.master.after(50, self.update)

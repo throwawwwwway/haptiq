@@ -89,7 +89,7 @@ if __name__ == "__main__":
     raw = init_raw_9()
 
     # Getting/Setting the view with networks and tracking mouse
-    view = HaptiqView(raw, ndata.all_networks(), True)
+    view = HaptiqView(raw, ndata.all_networks(), False)
 
     # Setting the behavior trigger, the tracker and the device controller
     behavior_thread = threading.Thread(target=behavior, args=(raw, view,))
@@ -98,7 +98,7 @@ if __name__ == "__main__":
 
     # threads starting
     behavior_thread.start()
-    # tracker_thread.start()
-    controller_thread.start()
+    tracker_thread.start()
+    # controller_thread.start()
 
     view.loop()  # runs the view, forever
