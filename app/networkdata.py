@@ -111,13 +111,26 @@ def two_nodes_network():
     return Network([Node(5, 5), Node(10, 10)], [])
 
 
+def horizontal_network():
+    a = Node(2, 8)
+    b = Node(15, 8)
+    return Network([a, b], [Link(a, b)], [])
+
+
+def vertical_network():
+    a = Node(7, 2)
+    b = Node(7, 15)
+    return Network([a, b], [Link(a, b)], [])
+
+
 def all_networks():
     return {
         "one node": one_node_network(),
         "two nodes": two_nodes_network(),
         "triangle": triangle_network(),
+        "horizontal line": horizontal_network(),
+        "vertical line": vertical_network()
         # "labyrinth": labyrinth_network(),
         # "concrete 1": conc1_network(),
-        # "explanatory 1": exp1_network(),
-        # "one node": one_node_network()
+        # "explanatory 1": exp1_network()
     }

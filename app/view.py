@@ -186,7 +186,7 @@ class Feedback(object):
 
     def update(self):
         for actuator in self.mapped_actuators:
-            cf.logger.debug("updating actuator {}".format(actuator.level))
+            # cf.logger.debug("updating actuator {}".format(actuator.level))
             self.canvas.itemconfig(
                 self.mapped_actuators[actuator],
                 fill=color_from_level(actuator.level))

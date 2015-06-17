@@ -54,6 +54,8 @@ class Network(object):
 
         for link in list(self.links_behavior.keys()):
             coord = link.closest_point_coord(self.raw.position)
+            if coord is None:
+                continue
             context = which_context(coord['distance'])
 
             if (context != Context.on):  # Get the direction towards link
@@ -94,6 +96,9 @@ class Line(object):
         u = line.vector[0]
         v = line.vector[1]
 
+        if a == 0:
+            return Point(pt_a.x, pt_b.y)
+
         part_result = pt_b.y - pt_a.y + (b / a) * (pt_a.x - pt_b.x)
         lb = part_result * (a / (b * u - a * v))
 
@@ -104,16 +109,18 @@ class Line(object):
 
 class Link(Line):
 
-    def __init__(self, node_a, node_b):
-        if node_a.x <= node_b.x:
-            self.first, self.sec = node_a, node_b
-        else:
-            self.first, self.sec = node_b, node_a
+    def __init__(self, a, b):
+        (self.first, self.sec) = (a, b) if a.x <= b.x else (b, a)
 
         vector = [self.sec.x - self.first.x, self.sec.y - self.first.y]
         super().__init__(self.first, vector)
 
     def closest_point_coord(self, point):
+        if point.x < self.first.x or point.x > self.sec.x:
+            return None  # point is outside of segment
+        if point.y < min(self.first.y, self.sec.y) or \
+           point.y > max(self.first.y, self.sec.y):
+            return None
         perpendicular = self.get_perpendicular(point)
         closest_point = self.get_intersection_point(perpendicular)
         return closest_point.polar_coord_of(point)

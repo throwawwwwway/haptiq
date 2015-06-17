@@ -1,7 +1,7 @@
 import threading
 import time
 import socket
-import app.conf as conf
+import app.conf as cf
 import app.networkdata as ndata
 
 from app.raw import Raw, Actuator, Button
@@ -16,7 +16,7 @@ UDP_PORT = 2390
 
 
 def init_raw_4():
-    conf.logger.info('Init raw')
+    cf.logger.info('Init raw')
     east = Actuator(0, 'East')
     north = Actuator(90, 'North')
     west = Actuator(180, 'West')
@@ -25,7 +25,7 @@ def init_raw_4():
 
 
 def init_raw_8():
-    conf.logger.info('Init raw 8 Actuators')
+    cf.logger.info('Init raw 8 Actuators')
     east = Actuator(0, 'East')
     north_east = Actuator(45, 'North-East')
     north = Actuator(90, 'North')
@@ -40,7 +40,7 @@ def init_raw_8():
 
 
 def init_raw_9():
-    conf.logger.info('Init raw 8 Actuators')
+    cf.logger.info('Init raw 8 Actuators')
     east = Actuator(0, 'East')
     north_east = Actuator(45, 'North-East')
     north = Actuator(90, 'North')
@@ -76,8 +76,11 @@ def controller(raw):
     while 1:
         for act in enumerate(raw.actuators):
             if act[1].should_update():
+                cf.logger.debug("udp sent with: ({}, {})".format(
+                    str(act[0]), str(act[1].level)))
                 msg = "{} {}".format(str(act[0]), str(act[1].level))
                 sock.sendto(bytes(msg, 'UTF-8'), (UDP_IP, UDP_PORT))
+                time.sleep(0.1)
         time.sleep(0.1)
 
 if __name__ == "__main__":
