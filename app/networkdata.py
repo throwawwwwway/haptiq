@@ -1,6 +1,37 @@
 from app.network import Node, Link, Network
 
 
+def whole_network():
+    a = Node(2, 2)
+    b = Node(7, 2)
+    c = Node(4, 4)
+    d = Node(7, 4)
+    e = Node(11, 4)
+    f = Node(12, 3)
+    g = Node(2, 8)
+    h = Node(9, 6)
+    i = Node(11, 8)
+    j = Node(2, 6)
+    links = [
+        Link(a, b),
+        Link(a, c),
+        Link(a, j),
+        Link(b, d),
+        Link(c, d),
+        Link(a, j),
+        Link(d, h),
+        Link(d, e),
+        Link(e, f),
+        Link(h, f),
+        Link(h, i),
+        Link(j, g),
+        Link(j, h)
+    ]
+    return Network(
+        [a, b, c, d, e, f, g, h, i, j],
+        links
+    )
+
 def exp1_network():
     home = Node(5, 8)
     cinema = Node(8, 7)
@@ -129,7 +160,8 @@ def all_networks():
         "two nodes": two_nodes_network(),
         "triangle": triangle_network(),
         "horizontal line": horizontal_network(),
-        "vertical line": vertical_network()
+        "vertical line": vertical_network(),
+        "whole network": whole_network()
         # "labyrinth": labyrinth_network(),
         # "concrete 1": conc1_network(),
         # "explanatory 1": exp1_network()
