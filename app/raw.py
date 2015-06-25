@@ -79,7 +79,7 @@ class Raw(object):
     @position.setter
     def position(self, value):
         if value != self._position:
-            cf.logger.debug("position is now: {}".format(str(value)))
+            # cf.logger.debug("position is now: {}".format(str(value)))
             self._position = value
 
     @property

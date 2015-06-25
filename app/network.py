@@ -1,4 +1,5 @@
 import math
+import app.conf as cf
 
 from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
 
@@ -6,10 +7,8 @@ from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
 def which_context(distance):
     if (distance < 10):
         return Context.on
-    if (distance < 40):
+    elif (distance < 50):
         return Context.hot
-    elif (distance < 70):
-        return Context.lukewarm
     elif (distance < 100):
         return Context.cold
     return Context.outrange
@@ -53,6 +52,7 @@ class Network(object):
                 context, actuators, coord)
 
         for link in list(self.links_behavior.keys()):
+
             coord = link.closest_point_coord(self.raw.position)
             if coord is None:
                 continue
@@ -68,8 +68,7 @@ class Network(object):
                     for direction in link.directions(self.raw.position)
                 ]
 
-            self.links_behavior[link].update_if_necessary(
-                context, actuators, coord)
+            self.links_behavior[link].update(context, actuators, coord)
 
 
 class Line(object):
@@ -109,21 +108,25 @@ class Line(object):
 
 class Link(Line):
 
-    def __init__(self, a, b):
+    def __init__(self, a, b, name=None):
+        self.name = name
         (self.first, self.sec) = (a, b) if a.x <= b.x else (b, a)
 
         vector = [self.sec.x - self.first.x, self.sec.y - self.first.y]
         super().__init__(self.first, vector)
 
+    def __str__(self):
+        return self.name if self.name is not None else\
+            str(self.first) + " " + str(self.sec)
+
     def closest_point_coord(self, point):
-        if point.x < self.first.x or point.x > self.sec.x:
-            return None  # point is outside of segment
-        if point.y < min(self.first.y, self.sec.y) or \
-           point.y > max(self.first.y, self.sec.y):
-            return None
         perpendicular = self.get_perpendicular(point)
-        closest_point = self.get_intersection_point(perpendicular)
-        return closest_point.polar_coord_of(point)
+        closest_pt = self.get_intersection_point(perpendicular)
+        if closest_pt.outbound(self.first, self.sec):
+            dist_w_first = point._distance_to(self.first)
+            dist_w_sec = point._distance_to(self.sec)
+            closest_pt = self.first if dist_w_first <= dist_w_sec else self.sec
+        return closest_pt.polar_coord_of(point)
 
     def directions(self, point):
         directions = []
@@ -147,6 +150,9 @@ class Point(object):
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
+
+    def __gt__(self, other):
+        return self.x > other.x and self.y > other.y
 
     def polar_coord_of(self, position):
         distance = self._distance_to(position)
@@ -172,6 +178,10 @@ class Point(object):
         # Enable full circle angles
         angle = angle if point.x < self.x else 360 - angle
         return (angle + 90) % 360  # rotation needed
+
+    def outbound(self, pt_a, pt_b):
+        return (self.x < min(pt_a.x, pt_b.x) or self.x > max(pt_a.x, pt_b.x) or
+                self.y < min(pt_a.y, pt_b.y) or self.y > max(pt_a.y, pt_b.y))
 
 
 class Node(Point):

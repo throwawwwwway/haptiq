@@ -93,9 +93,9 @@ def triangle_network():
     node_e = Node(6, 6)
     node_f = Node(14, 14)
 
-    link_1 = Link(node_a, node_b)
-    link_2 = Link(node_b, node_c)
-    link_3 = Link(node_c, node_a)
+    link_1 = Link(node_a, node_b, 'AB')
+    link_2 = Link(node_b, node_c, 'BC')
+    link_3 = Link(node_c, node_a, 'AC')
 
     return Network(
         [node_a, node_b, node_c, node_e, node_f],
