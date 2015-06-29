@@ -74,14 +74,14 @@ def tracker(raw, type=None):
 def controller(raw):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     while 1:
+        time.sleep(0.07)
         for act in enumerate(raw.actuators):
             if act[1].should_update():
                 cf.logger.debug("udp sent with: ({}, {})".format(
                     str(act[0]), str(act[1].level)))
                 msg = "{} {}".format(str(act[0]), str(act[1].level))
                 sock.sendto(bytes(msg, 'UTF-8'), (UDP_IP, UDP_PORT))
-                time.sleep(0.1)
-        time.sleep(0.1)
+                time.sleep(0.07)
 
 if __name__ == "__main__":
 

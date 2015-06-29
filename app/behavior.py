@@ -9,17 +9,24 @@ def gen_oscillation(height, steps):
 
 
 class Context(Enum):
-    on = 1
-    hot = 2
-    cold = 3
-    outrange = 4
+    on, hot, cold, outrange = 1, 2, 3, 4
+
+    @staticmethod
+    def which(distance):
+        return Context.on if distance < 10 else\
+            Context.hot if distance < 50 else\
+            Context.cold if distance < 100 else\
+            Context.outrange
 
 
 class Behavior(object):
 
-    default = 5
+    default = 10
     max_iter = 255
     _iter = 0
+
+    node_level = {1: 50, 2: None, 3: None, 4: 0}
+    link_level = {1: 30, 2: 30, 3: 0, 4: 0}
 
     def __init__(self):
         self.sequence = [Behavior.default]
@@ -34,41 +41,29 @@ class Behavior(object):
 
 
 class NodeBehavior(Behavior):
-    on = 30
-
     def __init__(self):
         super().__init__()
 
-    def update_if_necessary(self, context, actuators, coord):
+    def update(self, coord, actuators):
+        context = Context.which(coord['distance'])
         if (actuators == self.actuators and context == self.context):
             return  # nothing has changed from last time
 
         self.context = context
         self.actuators = actuators
-        if context == Context.on:
-            self.sequence = [NodeBehavior.on]
-        elif context == Context.hot:
-            self.sequence = gen_oscillation(10, 5)
+        if context == Context.hot:
+            self.sequence = gen_oscillation(20, 5)
         elif context == Context.cold:
-            self.sequence = gen_oscillation(10, 2)
-        elif context == Context.outrange:
-            self.sequence = [0]
+            self.sequence = gen_oscillation(20, 2)
+        else:  # on, outrange
+            self.sequence = [Behavior.node_level[context.value]]
 
 
 class LinkBehavior(Behavior):
-    on = 30
-
     def __init__(self):
         super().__init__()
 
-    def update(self, context, actuators, coord):
-        # We should update the behavior
-        self.context = context
+    def update(self, coord, actuators):
+        self.context = Context.which(coord['distance'])
         self.actuators = actuators
-        lvl = 30
-        if context == Context.on:
-            self.sequence = [LinkBehavior.on]
-        elif context == Context.hot:
-            self.sequence = [lvl]
-        else:
-            self.sequence = [0]
+        self.sequence = [Behavior.link_level[self.context.value]]

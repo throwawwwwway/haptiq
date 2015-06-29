@@ -1,17 +1,7 @@
 import math
-import app.conf as cf
+# import app.conf as cf
 
 from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
-
-
-def which_context(distance):
-    if (distance < 10):
-        return Context.on
-    elif (distance < 50):
-        return Context.hot
-    elif (distance < 100):
-        return Context.cold
-    return Context.outrange
 
 
 class Network(object):
@@ -40,35 +30,52 @@ class Network(object):
     def update_behaviors(self):
         """Update the behaviors"""
 
-        for node in list(self.nodes_behavior.keys()):
-            coord = node.polar_coord_of(self.raw.position)
-            context = which_context(coord['distance'])
+        # nodes
+        if self.node_under() is not None:
+            self.nodes_behavior[self.node_under()].update(
+                (self.node_under()).polar_coord_of(self.raw.position),
+                self.raw.actuators
+            )
+        else:
+            for node in list(self.nodes_behavior.keys()):
+                coord = node.polar_coord_of(self.raw.position)
+                self.nodes_behavior[node].update(
+                    coord,
+                    [self.raw.actuator_for_angle(coord['angle'])]
+                )
 
-            if (context == Context.on):
-                actuators = self.raw.actuators
-            else:
-                actuators = [self.raw.actuator_for_angle(coord['angle'])]
-            self.nodes_behavior[node].update_if_necessary(
-                context, actuators, coord)
-
-        for link in list(self.links_behavior.keys()):
-
+        # links
+        for link in self.near_links():
             coord = link.closest_point_coord(self.raw.position)
-            if coord is None:
-                continue
-            context = which_context(coord['distance'])
-
-            if (context != Context.on):  # Get the direction towards link
-                actuators = [
-                    self.raw.actuator_for_angle(coord['angle'])
-                ]
-            else:   # Get the directions offered by the link
+            if Context.which(coord['distance']) != Context.on:
+                # Get the direction towards link
+                actuators = [self.raw.actuator_for_angle(coord['angle'])]
+            else:
+                # Get the directions offered by the link
                 actuators = [
                     self.raw.actuator_for_angle(direction)
                     for direction in link.directions(self.raw.position)
                 ]
+            self.links_behavior[link].update(coord, actuators)
 
-            self.links_behavior[link].update(context, actuators, coord)
+    def node_under(self):
+        for node in list(self.nodes_behavior.keys()):
+            ctxt = Context.which(node._distance_to(self.raw.position))
+            if ctxt == Context.on:
+                return node
+        return None
+
+    def near_links(self):
+
+        near_links = (Context.outrange.value, [])
+        for link in list(self.links_behavior.keys()):
+            coord = link.closest_point_coord(self.raw.position)
+            context = Context.which(coord['distance'])
+            if context.value < near_links[0]:
+                near_links = (context.value, [link])
+            elif context.value == near_links[0]:
+                near_links[1].append(link)
+        return near_links[1]
 
 
 class Line(object):
