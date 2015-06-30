@@ -99,6 +99,6 @@ if __name__ == "__main__":
     # threads starting
     behavior_thread.start()
     # tracker_thread.start()
-    # controller_thread.start()
+    controller_thread.start()
 
     view.loop()  # runs the view, forever

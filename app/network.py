@@ -45,7 +45,10 @@ class Network(object):
                 )
 
         # links
-        for link in self.near_links():
+        for link in list(self.links_behavior.keys()):
+            if link not in self.near_links():
+                self.links_behavior[link].update(None, [])
+                continue
             coord = link.closest_point_coord(self.raw.position)
             if Context.which(coord['distance']) != Context.on:
                 # Get the direction towards link

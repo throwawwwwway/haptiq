@@ -25,7 +25,7 @@ class Behavior(object):
     max_iter = 255
     _iter = 0
 
-    node_level = {1: 50, 2: None, 3: None, 4: 0}
+    node_level = {1: 30, 2: None, 3: None, 4: 0}
     link_level = {1: 30, 2: 30, 3: 0, 4: 0}
 
     def __init__(self):
@@ -64,6 +64,6 @@ class LinkBehavior(Behavior):
         super().__init__()
 
     def update(self, coord, actuators):
-        self.context = Context.which(coord['distance'])
+        self.context = Context.which(coord['distance']) if coord is not None else Context.outrange
         self.actuators = actuators
         self.sequence = [Behavior.link_level[self.context.value]]
