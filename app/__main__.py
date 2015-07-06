@@ -5,7 +5,6 @@ import app.conf as cf
 import app.networkdata as ndata
 
 from app.raw import Raw, Actuator, Button
-# from app.simulator import HaptiqSimulator
 from app.view import HaptiqView
 from app.tuio import TuioServer
 from app.handler import Handler
@@ -73,15 +72,15 @@ def tracker(raw, type=None):
 
 def controller(raw):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-    while 1:
-        time.sleep(0.07)
+    while True:
+        time.sleep(0.05)
         for act in enumerate(raw.actuators):
             if act[1].should_update():
                 cf.logger.debug("udp sent with: ({}, {})".format(
                     str(act[0]), str(act[1].level)))
                 msg = "{} {}".format(str(act[0]), str(act[1].level))
                 sock.sendto(bytes(msg, 'UTF-8'), (UDP_IP, UDP_PORT))
-                time.sleep(0.07)
+                time.sleep(0.05)
 
 if __name__ == "__main__":
 
@@ -99,6 +98,6 @@ if __name__ == "__main__":
     # threads starting
     behavior_thread.start()
     # tracker_thread.start()
-    controller_thread.start()
+    # controller_thread.start()
 
     view.loop()  # runs the view, forever

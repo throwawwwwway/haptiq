@@ -38,6 +38,7 @@ class Haptiq(object):
 
 class Actuator(Haptiq):
     """ Actuator class represents the different actuators of the HaptiQ. """
+    default = 10
 
     def __init__(self, angle=None, name='actuator', level=0):
         self.angle = angle
@@ -57,7 +58,7 @@ class Raw(object):
         Raw is the interface that will serve as an interpret with the HaptiQ.
     """
 
-    def __init__(self, actuators=(), button=None):
+    def __init__(self, actuators=[], button=None):
         """
             Initialize a Raw interface with:
             actuautors at level 0
@@ -104,3 +105,6 @@ class Raw(object):
     def set_all_at(self, level):
         for actuator in self.actuators:
             actuator.level = level
+
+    def reset_actuators(self):
+        self.set_all_at(Actuator.default)

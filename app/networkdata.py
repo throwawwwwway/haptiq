@@ -2,16 +2,16 @@ from app.network import Node, Link, Network
 
 
 def whole_network():
-    a = Node(2, 2)
-    b = Node(7, 2)
-    c = Node(4, 4)
-    d = Node(7, 4)
-    e = Node(11, 4)
-    f = Node(12, 3)
-    g = Node(2, 8)
-    h = Node(9, 6)
-    i = Node(11, 8)
-    j = Node(2, 6)
+    a = Node(3, 4)
+    b = Node(10.5, 4)
+    c = Node(6, 8)
+    d = Node(10.5, 8)
+    e = Node(16.5, 8)
+    f = Node(18, 6)
+    g = Node(3, 16)
+    h = Node(13.5, 12)
+    i = Node(16.5, 16)
+    j = Node(3, 12)
     links = [
         Link(a, b),
         Link(a, c),

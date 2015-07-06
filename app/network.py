@@ -4,81 +4,51 @@ import math
 from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
 
 
-class Network(object):
+class Point(object):
+    """ Point class represents and manipulates x, y coords. """
 
-    def __init__(self, nodes=[], links=[], raw=None):
-        self.raw = raw
-        self.nodes_behavior = {}
-        self.links_behavior = {}
-        for node in nodes:
-            self.nodes_behavior[node] = NodeBehavior()
-        for link in links:
-            self.links_behavior[link] = LinkBehavior()
+    def __init__(self, x=0, y=0):
+        """Create a new point with x and y, by default 0, 0"""
+        self.x = x
+        self.y = y
 
-    def apply_behaviors(self):
-        """
-            Apply the behavior for each node and link.
-            The behavior can be an oscillation or a constant.
-        """
-        self.raw.set_all_at(Behavior.default)
-        for node in self.nodes_behavior:
-            self.nodes_behavior[node].apply()
-        for link in self.links_behavior:
-            self.links_behavior[link].apply()
-        Behavior._iter += 1
+    def __str__(self):
+        return "Point ({}, {})".format(str(self.x), str(self.y))
 
-    def update_behaviors(self):
-        """Update the behaviors"""
+    def __eq__(self, other):
+        return self.x == other.x and self.y == other.y
 
-        # nodes
-        if self.node_under() is not None:
-            self.nodes_behavior[self.node_under()].update(
-                (self.node_under()).polar_coord_of(self.raw.position),
-                self.raw.actuators
-            )
-        else:
-            for node in list(self.nodes_behavior.keys()):
-                coord = node.polar_coord_of(self.raw.position)
-                self.nodes_behavior[node].update(
-                    coord,
-                    [self.raw.actuator_for_angle(coord['angle'])]
-                )
+    def __gt__(self, other):
+        return self.x > other.x and self.y > other.y
 
-        # links
-        for link in list(self.links_behavior.keys()):
-            if link not in self.near_links():
-                self.links_behavior[link].update(None, [])
-                continue
-            coord = link.closest_point_coord(self.raw.position)
-            if Context.which(coord['distance']) != Context.on:
-                # Get the direction towards link
-                actuators = [self.raw.actuator_for_angle(coord['angle'])]
-            else:
-                # Get the directions offered by the link
-                actuators = [
-                    self.raw.actuator_for_angle(direction)
-                    for direction in link.directions(self.raw.position)
-                ]
-            self.links_behavior[link].update(coord, actuators)
+    def polar_coord_to(self, position):
+        distance = self._distance_to(position)
+        return {
+            'angle': self._angle_with(position, distance),
+            'distance': distance
+        }
 
-    def node_under(self):
-        for node in list(self.nodes_behavior.keys()):
-            ctxt = Context.which(node._distance_to(self.raw.position))
-            if ctxt == Context.on:
-                return node
-        return None
+    def _distance_to(self, point):
+        sq_dist_x = (self.x - point.x) ** 2
+        sq_dist_y = (self.y - point.y) ** 2
+        return math.sqrt(sq_dist_x + sq_dist_y)
 
-    def near_links(self):
+    def _angle_with(self, point, distance=None):
+        # Using this formula cos(a) = opp/hyp
+        opposite = self.y - point.y
+        hypot = self._distance_to(point) if distance is None else distance
+        if (opposite == 0):
+            return 0 if self.x < point.x else 180
+        elif (hypot == 0):  # not tested
+            return 0
+        angle = math.degrees(math.acos(opposite / hypot))
+        # Enables full circle angles
+        angle = angle if point.x < self.x else 360 - angle
+        return (angle + 90) % 360  # rotation needed, since normal is facing up
 
-        near_links = (Context.outrange.value, [])
-        for link in list(self.links_behavior.keys()):
-            coord = link.closest_point_coord(self.raw.position)
-            context = Context.which(coord['distance'])
-            if context.value < near_links[0]:
-                near_links = (context.value, [link])
-            elif context.value == near_links[0]:
-                near_links[1].append(link)
-        return near_links[1]
+    def outbound(self, pt_a, pt_b):
+        return (self.x < min(pt_a.x, pt_b.x) or self.x > max(pt_a.x, pt_b.x) or
+                self.y < min(pt_a.y, pt_b.y) or self.y > max(pt_a.y, pt_b.y))
 
 
 class Line(object):
@@ -116,7 +86,33 @@ class Line(object):
             pt_b.y + lb * v)
 
 
-class Link(Line):
+class NetworkElem(object):
+    def __init__(self):
+        pass
+
+
+class Node(Point, NetworkElem):
+
+    base_x = 25
+    base_y = 25
+
+    def __init__(self, x, y):
+        super().__init__(Node.base_x * x, Node.base_y * y)
+
+    def __str__(self):
+        return "Node ({}, {})".format(self.x, self.y)
+
+    def __hash__(self):  # not tested
+        return hash(self.__key())
+
+    def __key(self):  # not tested
+        return tuple(v for k, v in sorted(self.__dict__.items()))
+
+    def default_behavior(self):
+        return NodeBehavior()
+
+
+class Link(Line, NetworkElem):
 
     def __init__(self, a, b, name=None):
         self.name = name
@@ -129,14 +125,14 @@ class Link(Line):
         return self.name if self.name is not None else\
             str(self.first) + " " + str(self.sec)
 
-    def closest_point_coord(self, point):
+    def polar_coord_to(self, point):
         perpendicular = self.get_perpendicular(point)
         closest_pt = self.get_intersection_point(perpendicular)
         if closest_pt.outbound(self.first, self.sec):
             dist_w_first = point._distance_to(self.first)
             dist_w_sec = point._distance_to(self.sec)
             closest_pt = self.first if dist_w_first <= dist_w_sec else self.sec
-        return closest_pt.polar_coord_of(point)
+        return closest_pt.polar_coord_to(point)
 
     def directions(self, point):
         directions = []
@@ -146,67 +142,49 @@ class Link(Line):
             directions.append(self.sec._angle_with(self.first))
         return directions
 
-
-class Point(object):
-    """ Point class represents and manipulates x, y coords. """
-
-    def __init__(self, x=0, y=0):
-        """Create a new point with x and y, by default 0, 0"""
-        self.x = x
-        self.y = y
-
-    def __str__(self):
-        return "POINT ({} {})".format(str(self.x), str(self.y))
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-    def __gt__(self, other):
-        return self.x > other.x and self.y > other.y
-
-    def polar_coord_of(self, position):
-        distance = self._distance_to(position)
-        return {
-            'angle': self._angle_with(position, distance),
-            'distance': distance
-        }
-
-    def _distance_to(self, point):
-        sq_dist_x = (self.x - point.x) ** 2
-        sq_dist_y = (self.y - point.y) ** 2
-        return math.sqrt(sq_dist_x + sq_dist_y)
-
-    def _angle_with(self, point, distance=None):
-        # Using this formula cos(a) = opp/hyp
-        opposite = self.y - point.y
-        hypot = self._distance_to(point) if distance is None else distance
-        if (opposite == 0):
-            return 0 if self.x < point.x else 180
-        elif (hypot == 0):  # not tested
-            return 0
-        angle = math.degrees(math.acos(opposite / hypot))
-        # Enable full circle angles
-        angle = angle if point.x < self.x else 360 - angle
-        return (angle + 90) % 360  # rotation needed
-
-    def outbound(self, pt_a, pt_b):
-        return (self.x < min(pt_a.x, pt_b.x) or self.x > max(pt_a.x, pt_b.x) or
-                self.y < min(pt_a.y, pt_b.y) or self.y > max(pt_a.y, pt_b.y))
+    def default_behavior(self):
+        return LinkBehavior()
 
 
-class Node(Point):
+class Network(object):
 
-    base_x = 25
-    base_y = 25
+    def __init__(self, nodes=[], links=[], raw=None):
+        self.raw = raw
+        self.elems = {e: (e.default_behavior(), []) for e in nodes + links}
 
-    def __init__(self, x, y):
-        super().__init__(Node.base_x * x, Node.base_y * y)
+    def apply_behaviors(self):
+        """
+            Apply for each network element the set behavior
+            to corresponding the actuators
+        """
 
-    def __str__(self):
-        return "NODE ({} {})".format(self.x, self.y)
+        self.raw.reset_actuators()
+        for (behavior, actuators) in self.elems.values():
+            behavior.apply(actuators)
+        Behavior._iter += 1  # for syncing behavior
 
-    def __hash__(self):  # not tested
-        return hash(self.__key())
+    def update_behaviors(self):
+        """Update the behaviors"""
 
-    def __key(self):  # not tested
-        return tuple(v for k, v in sorted(self.__dict__.items()))
+        sorted_keys = sorted(
+            self.elems,
+            key=lambda e: e.polar_coord_to(self.raw.position)['distance']
+        )
+
+        for elem in sorted_keys:
+            coord = elem.polar_coord_to(self.raw.position)
+            context = Context.which(coord['distance'])
+
+            (behavior, actuators) = self.elems[elem]
+            if context == Context.on:
+                if type(elem) == Node:
+                    actuators = self.raw.actuators
+                else:
+                    actuators = [
+                        self.raw.actuator_for_angle(direction)
+                        for direction in elem.directions(self.raw.position)
+                    ]
+            else:
+                actuators = [self.raw.actuator_for_angle(coord['angle'])]
+            behavior.update(context)
+            self.elems[elem] = (behavior, actuators)
