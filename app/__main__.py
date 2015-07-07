@@ -1,9 +1,11 @@
 import threading
 import time
 import socket
+import serial
+import os.path
+
 import app.conf as cf
 import app.networkdata as ndata
-
 from app.raw import Raw, Actuator, Button
 from app.view import HaptiqView
 from app.tuio import TuioServer
@@ -12,6 +14,9 @@ from app.handler import Handler
 
 UDP_IP = "192.168.43.224"
 UDP_PORT = 2390
+
+# SERIAL_PATH = '/dev/tty.usbmodem1411'
+SERIAL_PATH = '/dev/cu.HC-06-DevB'
 
 
 def init_raw_4():
@@ -70,7 +75,24 @@ def tracker(raw, type=None):
     server.start()
 
 
-def controller(raw):
+def controller_serial(raw):
+    path = SERIAL_PATH
+    while not os.path.exists(path):
+        print("The serial path: {} is invalid.".format(path))
+        path = input("Please enter valid serial: ")
+    ser = serial.Serial(path, baudrate=115200, timeout=0)
+    while True:
+        time.sleep(1)
+        for act in enumerate(raw.actuators):
+            if act[1].should_update():
+                cf.logger.debug("serial sent with: ({}, {})".format(
+                    str(act[0]), str(act[1].level)))
+                msg = 's{}{}'.format(str(act[0]), str(act[1].level))
+                ser.write(bytes(msg, 'UTF-8'))
+                time.sleep(0.05)
+
+
+def controller_udb(raw):
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     while True:
         time.sleep(0.05)
@@ -93,11 +115,11 @@ if __name__ == "__main__":
     # Setting the behavior trigger, the tracker and the device controller
     behavior_thread = threading.Thread(target=behavior, args=(raw, view,))
     tracker_thread = threading.Thread(target=tracker, args=(raw,))
-    controller_thread = threading.Thread(target=controller, args=(raw,))
+    controller_thread = threading.Thread(target=controller_serial, args=(raw,))
 
     # threads starting
     behavior_thread.start()
     # tracker_thread.start()
-    # controller_thread.start()
+    controller_thread.start()
 
     view.loop()  # runs the view, forever
