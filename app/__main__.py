@@ -76,19 +76,15 @@ def tracker(raw, type=None):
 
 
 def controller_serial(raw):
-    path = SERIAL_PATH
-    while not os.path.exists(path):
-        print("The serial path: {} is invalid.".format(path))
-        path = input("Please enter valid serial: ")
-    ser = serial.Serial(path, baudrate=115200, timeout=0)
+    ser = serial.Serial(SERIAL_PATH, baudrate=115200, timeout=0)
     while True:
+        time.sleep(0.1)
         for act in enumerate(raw.actuators):
             if act[1].should_update():
                 cf.logger.debug("serial sent with: ({}, {})".format(
                     str(act[0]), str(act[1].level)))
                 msg = 's{}{}f'.format(str(act[0]), str(act[1].level))
                 ser.write(bytes(msg, 'UTF-8'))
-                time.sleep(0.05)
 
 
 def controller_udb(raw):
@@ -109,7 +105,7 @@ if __name__ == "__main__":
     raw = init_raw_9()
 
     # Getting/Setting the view with networks and tracking mouse
-    view = HaptiqView(raw, ndata.all_networks(), True)
+    view = HaptiqView(raw, ndata.all_networks(), False)
 
     # Setting the behavior trigger, the tracker and the device controller
     behavior_thread = threading.Thread(target=behavior, args=(raw, view,))
@@ -118,7 +114,7 @@ if __name__ == "__main__":
 
     # threads starting
     behavior_thread.start()
-    # tracker_thread.start()
+    tracker_thread.start()
     controller_thread.start()
 
     view.loop()  # runs the view, forever

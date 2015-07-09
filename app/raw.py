@@ -91,8 +91,8 @@ class Raw(object):
     def orientation(self, value):
         value = (value - 90) % 360  # north is the "normal orientation"
         if value != self.orientation:
-            # cf.logger.debug("orientation is now: {}".format(str(value)))
-            self._orientation = value
+            cf.logger.debug("orientation is now: {}".format(str(value)))
+            # self._orientation = value
 
     def actuator_for_angle(self, angle):
         angle = (angle + 180 - self.orientation) % 360
