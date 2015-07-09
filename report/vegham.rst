@@ -89,3 +89,4 @@ This report has also been emphasizing the development side of the internship on 
 
 
 
+The work becomes research once the last sentence of the report written. Like, problem we allow people using results, but how about the device itself? Research can also consider the fact of making your project redoable.
