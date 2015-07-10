@@ -4,9 +4,9 @@ from logging.handlers import RotatingFileHandler
 
 
 # creating loggin object
-logger = logging.getLogger()
+log = logging.getLogger()
 # setting the lowest loggin level (DEBUG <-> everything)
-logger.setLevel(logging.DEBUG)
+log.setLevel(logging.DEBUG)
 # formating logs
 # formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
 formatter = logging.Formatter('%(levelname)s :: %(message)s')
@@ -18,13 +18,13 @@ file_handler.setLevel(logging.WARNING)
 file_handler.setFormatter(formatter)
 
 # attach the handler to our loggin object
-logger.addHandler(file_handler)
+log.addHandler(file_handler)
 # stream to console
 steam_handler = logging.StreamHandler()
 steam_handler.setLevel(logging.DEBUG)
 steam_handler.setFormatter(formatter)
-logger.addHandler(steam_handler)
+log.addHandler(steam_handler)
 
 # How to log:
-# logger.info('Hello')
-# logger.warning('Testing %s', 'foo')
+# log.info('Hello')
+# log.warning('Testing %s', 'foo')

@@ -1,10 +1,10 @@
 import argparse
-import app.conf as cf
+import app.logconfig as lc
 
 from pythonosc import dispatcher
 from pythonosc import osc_server
 from app.handler import Handler
-from app.raw import Raw
+from app.device import Device
 from app.network import Point
 
 
@@ -30,7 +30,7 @@ def interpret_2Dcur(*args):  # noqa
     elif args[2] == 'set':
         handler.points[args[3]] = Point(args[4], args[5])
     elif args[2] == 'fseq':
-        handler.update_raw()
+        handler.update_device()
 
 
 class TuioServer(object):
@@ -45,16 +45,21 @@ class TuioServer(object):
         disp = dispatcher.Dispatcher()
         disp.map("/tuio/2Dcur", interpret_2Dcur, self.handler)
 
-        self.server = osc_server.ThreadingOSCUDPServer(
-            (args.ip, args.port), disp)
-        print("Serving on {}".format(self.server.server_address))
+        self.server = None
+        try:
+            self.server = osc_server.ThreadingOSCUDPServer(
+                (args.ip, args.port), disp)
+            lc.log.debug("Serving on {}".format(self.server.server_address))
+        except:
+            lc.log.warning("Cannot listen on port 3333. Is port used?")
 
     def start(self):
-        self.server.serve_forever()
+        if self.server is not None:
+            self.server.serve_forever()
 
 
 if __name__ == '__main__':
-    points_handler = Handler(Raw())
+    points_handler = Handler(Device())
     tuio = TuioServer("0.0.0.0", 3333, points_handler)
-    cf.logger.debug("Tuio Server launched")
+    lc.log.debug("Tuio Server launched")
     tuio.start()

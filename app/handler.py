@@ -1,5 +1,5 @@
 from app.network import Point
-import app.conf as cf
+import app.logconfig as lc
 
 
 def get_triangle(points):
@@ -26,8 +26,8 @@ def get_triangle(points):
 
 class Handler(object):
 
-    def __init__(self, raw, width=500, height=500):
-        self.raw = raw
+    def __init__(self, device, width=500, height=500):
+        self.device = device
         self.width = width
         self.height = height
         self.points = {}
@@ -41,7 +41,7 @@ class Handler(object):
         for pt in self.points.values():
             x += pt.x
             y += pt.y
-        self.raw.position = Point(
+        self.device.position = Point(
             int(x / n_pts * self.width),
             int(y / n_pts * self.height)
         )
@@ -49,49 +49,25 @@ class Handler(object):
     def update_orientation(self):
         triangle = get_triangle(list(self.points.values()))
         if triangle is None:
-            cf.logger.debug("Triangle not found")
+            lc.log.debug("Triangle not found")
         else:
             middle = Point(
                 (triangle['right'].x + triangle['left'].x) / 2,
                 (triangle['right'].y + triangle['left'].y) / 2,
             )
-            self.raw.orientation = middle._angle_with(triangle['top'])
+            self.device.orientation = middle._angle_with(triangle['top'])
 
     def manage(self, points):
         if not self.waiting_update:
             self.waiting_update = True
             self.points = {id: Point() for id in points}
 
-    def update_raw(self):
+    def update_device(self):
         if self.waiting_update:
             self.update_position()
             if len(self.points) == 3:
                 self.update_orientation()
             self.waiting_update = False
-
-# def manage(self, id, x, y):
-#     # cf.logger.debug("Point {}: ({}, {}) handled".format(
-#     #     str(id), str(x), str(y)))
-#     if len(self.points) == 3 and id not in self.points:
-#         cf.logger.debug("New point")
-#         self.points = {id: Point(x, y)}
-#     else:
-#         self.points[id] = Point(x, y)
-#         self.set_position()
-#         if len(self.points) < 3:
-#             cf.logger.debug("Not enough points")
-#             return
-#         triangle = get_triangle(list(self.points.values()))
-#         if triangle is None:
-#             print("Triangle not found")
-#             for id, pt in self.points.items():
-#                 print("{}: {}".format(id, str(pt)))
-#         else:
-#             middle = Point(
-#                 (triangle['right'].x + triangle['left'].x) / 2,
-#                 (triangle['right'].y + triangle['left'].y) / 2,
-#             )
-#             self.raw.orientation = middle._angle_with(triangle['top'])
 
 
 if __name__ == '__main__':

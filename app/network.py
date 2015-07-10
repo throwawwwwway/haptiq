@@ -1,5 +1,4 @@
 import math
-# import app.conf as cf
 
 from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
 

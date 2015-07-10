@@ -1,5 +1,3 @@
-import app.conf as cf      # noqa
-
 from enum import Enum
 
 

@@ -1,15 +1,15 @@
 import tkinter as tk
-import app.conf as cf
+import app.logconfig as lc
 
 from tkinter import Canvas, Menu
-from app.raw import Point
+from app.device import Point
 from app.network import Node, Link
 from functools import partial
 
 
-def motion(event, raw):
+def motion(event, device):
     x, y = event.x, event.y
-    raw.position = Point(x, y)
+    device.position = Point(x, y)
 
 
 def color_from_level(level):
@@ -18,60 +18,93 @@ def color_from_level(level):
     return '#%02x%02x%02x' % (intensity, intensity, intensity)
 
 
-class HaptiqView(object):
+class View(object):
 
-    def __init__(self, raw, networks=None, mouse_tracking=False):
+    def __init__(self, device, **opts):
+
         self.root = tk.Tk()
-        self.networks = networks
+        self.networks = opts['networks'] if 'networks' in opts else []
+        self.interacts = opts['interacts'] if 'interacts' in opts else []
+
+        self._network = None
+        self._interaction = None
 
         menubar = Menu(self.root)
         self.root.config(menu=menubar)
-        filemenu = Menu(menubar)
-        menubar.add_cascade(label="File", menu=filemenu)
-        for key, network in networks.items():
-            network.raw = raw
-            partial_command = partial(self.load_network, key)
-            filemenu.add_command(
-                label=key, command=partial_command)
-        filemenu.add_separator()
-        filemenu.add_command(label="Exit", command=self.on_exit)
 
-        self.scene = Scene(self.root, raw, mouse_tracking)
-        self.load_network(next(iter(networks)))
+        if self.networks != []:
+            newtwork_menu = Menu(menubar)
+            menubar.add_cascade(label="Networks", menu=newtwork_menu)
+            for key, network in self.networks.items():
+                partial_command = partial(self.load_network, key)
+                newtwork_menu.add_command(
+                    label=key, command=partial_command)
 
-    def loop(self):
-        self.root.mainloop()
+        if self.interacts != []:
+            interaction_menu = Menu(menubar)
+            menubar.add_cascade(label="Interactions", menu=interaction_menu)
+            for key, interaction in self.interacts.items():
+                interaction.device = device
+                interaction.view = self
+                partial_command = partial(
+                    self.load_interaction, key)
+                interaction_menu.add_command(
+                    label=key, command=partial_command)
 
-    def load_network(self, network_key):
-        print("load_network called with: " + str(network_key))
-        self.network = self.networks[network_key]
+        self.scene = Scene(self.root, device, 'mouse_tracking' in opts)
+
+    @property
+    def network(self):
+        return self._network
+
+    @network.setter
+    def network(self, value):
+        self._network = value
+        lc.log.info("network loaded")
         self.scene.draw_network(self.network)
 
-    def current_network(self):
-        return self.network
+    def load_network(self, key):
+        self.network = self.networks[key]
+
+    @property
+    def interaction(self):
+        return self._interaction
+
+    @interaction.setter
+    def interaction(self, value):
+        self._interaction = value
+        lc.log.info("interaction loaded")
+        # self.scene.refresh_interaction()
+
+    def load_interaction(self, key):
+        lc.log.info("interaction loaded")
+        self.interaction = self.interacts[key]
 
     def on_exit(self):
         self.root.destroy()
 
+    def loop(self):
+        self.root.mainloop()
+
 
 class Scene(object):
-    def __init__(self, master, raw, mouse_tracking=False):
+    def __init__(self, master, device, mouse_tracking=False):
         self.master = master
-        self.raw = raw
+        self.device = device
         self.frame = tk.Frame(self.master)
-        self.buttonFeedback = tk.Button(
+        self.feedbackButton = tk.Button(
             self.frame,
             text="Feedback window",
             width=25,
             command=self.open_feedback
         )
-        self.buttonFeedback.pack()
+        self.feedbackButton.pack()
         self.explore_canvas = Canvas(master, width=500, height=500)
         self.explore_canvas.pack()
 
         if mouse_tracking:
             self.explore_canvas.bind(
-                '<Motion>', lambda event, raw=raw: motion(event, raw))
+                '<Motion>', lambda event, device=device: motion(event, device))
 
         self.enable_position_feedback()
         self.network_drawings = []
@@ -82,8 +115,8 @@ class Scene(object):
 
     def enable_position_feedback(self):
         self.device_cursor = self.explore_canvas.create_oval(
-            self.raw.position.x - 2.5, self.raw.position.y - 2.5,
-            self.raw.position.x + 2.5, self.raw.position.y + 2.5)
+            self.device.position.x - 2.5, self.device.position.y - 2.5,
+            self.device.position.x + 2.5, self.device.position.y + 2.5)
 
     def draw_network(self, network):
         self.explore_canvas.delete('all')
@@ -108,22 +141,22 @@ class Scene(object):
         center = ((coords[0] + coords[2]) / 2, (coords[1] + coords[3]) / 2)
         self.explore_canvas.move(
             self.device_cursor,
-            self.raw.position.x - center[0],
-            self.raw.position.y - center[1])
+            self.device.position.x - center[0],
+            self.device.position.y - center[1])
         if self.app and not self.app.closed:
             self.app.update()
         self.master.after(50, self.update)
 
     def open_feedback(self):
         self.feedbackWindow = tk.Toplevel(self.master)
-        self.app = Feedback(self.feedbackWindow, self.raw)
+        self.app = Feedback(self.feedbackWindow, self.device)
 
 
 class Feedback(object):
 
-    def __init__(self, master, raw):
+    def __init__(self, master, device):
         self.master = master
-        self.raw = raw
+        self.device = device
         self.frame = tk.Frame(master)
         self.on_update = False
         self.mapped_actuators = {}
@@ -136,7 +169,7 @@ class Feedback(object):
         self.canvas = Canvas(master, width=250, height=250)
         self.canvas.pack()
         self.set_mapping()
-        cf.logger.debug("Raw actuators: {}".format(self.raw.actuators))
+        lc.log.debug("device actuators: {}".format(self.device.actuators))
 
         self.frame.pack()
         self.closed = False
@@ -156,7 +189,7 @@ class Feedback(object):
         self.west = self.canvas.create_line(
             cntr_x - 8, cntr_y, cntr_x - straight, cntr_y, width=wd)
 
-        if len(self.raw.actuators) == 8:
+        if len(self.device.actuators) == 8:
             diag = straight * 0.75
             self.north_east = self.canvas.create_line(
                 cntr_x + 8, cntr_y - 8, cntr_x + diag, cntr_y - diag, width=wd)
@@ -167,31 +200,25 @@ class Feedback(object):
             self.north_west = self.canvas.create_line(
                 cntr_x - 8, cntr_y - 8, cntr_x - diag, cntr_y - diag, width=wd)
             self.mapped_actuators = {
-                self.raw.actuators[0]: self.east,
-                self.raw.actuators[1]: self.north_east,
-                self.raw.actuators[2]: self.north,
-                self.raw.actuators[3]: self.north_west,
-                self.raw.actuators[4]: self.west,
-                self.raw.actuators[5]: self.south_west,
-                self.raw.actuators[6]: self.south,
-                self.raw.actuators[7]: self.south_east
+                self.device.actuators[0]: self.east,
+                self.device.actuators[1]: self.north_east,
+                self.device.actuators[2]: self.north,
+                self.device.actuators[3]: self.north_west,
+                self.device.actuators[4]: self.west,
+                self.device.actuators[5]: self.south_west,
+                self.device.actuators[6]: self.south,
+                self.device.actuators[7]: self.south_east
             }
         else:
             self.mapped_actuators = {
-                self.raw.actuators[0]: self.east,
-                self.raw.actuators[1]: self.north,
-                self.raw.actuators[2]: self.west,
-                self.raw.actuators[3]: self.south,
+                self.device.actuators[0]: self.east,
+                self.device.actuators[1]: self.north,
+                self.device.actuators[2]: self.west,
+                self.device.actuators[3]: self.south,
             }
-
-        if self.raw.button is not None:
-            self.center = self.canvas.create_oval(
-                cntr_x - 10, cntr_y - 10, cntr_x + 10, cntr_y + 10)
-            self.mapped_actuators[self.raw.button] = self.center
 
     def update(self):
         for actuator in self.mapped_actuators:
-            # cf.logger.debug("updating actuator {}".format(actuator.level))
             self.canvas.itemconfig(
                 self.mapped_actuators[actuator],
                 fill=color_from_level(actuator.level))

@@ -1,36 +1,24 @@
 from app.network import Node, Link, Network
+from app.actuator import Actuator, Button
+from app.interactions import HaptiQInteract, VoiceInteract, KeyboardInteract
+
+
+# --------------    Networks   --------------
 
 
 def whole_network():
-    a = Node(3, 4)
-    b = Node(10.5, 4)
-    c = Node(6, 8)
-    d = Node(10.5, 8)
-    e = Node(16.5, 8)
-    f = Node(18, 6)
-    g = Node(3, 16)
-    h = Node(13.5, 12)
-    i = Node(16.5, 16)
-    j = Node(3, 12)
-    links = [
-        Link(a, b),
-        Link(a, c),
-        Link(a, j),
-        Link(b, d),
-        Link(c, d),
-        Link(a, j),
-        Link(d, h),
-        Link(d, e),
-        Link(e, f),
-        Link(h, f),
-        Link(h, i),
-        Link(j, g),
-        Link(j, h)
-    ]
+    a, b, c, d = Node(3, 4), Node(10.5, 4), Node(6, 8), Node(10.5, 8)
+    e, f, g, h = Node(16.5, 8), Node(18, 6), Node(3, 16), Node(13.5, 12)
+    i, j = Node(16.5, 16), Node(3, 12)
     return Network(
         [a, b, c, d, e, f, g, h, i, j],
-        links
+        [
+            Link(a, b), Link(a, c), Link(a, j), Link(b, d), Link(c, d),
+            Link(a, j), Link(d, h), Link(d, e), Link(e, f), Link(h, f),
+            Link(h, i), Link(j, g), Link(j, h)
+        ]
     )
+
 
 def exp1_network():
     home = Node(5, 8)
@@ -85,38 +73,6 @@ def conc1_network():
     )
 
 
-def labyrinth_network():
-    node_a = Node(3, 3)
-    node_b = Node(6, 3)
-    node_c = Node(6, 6)
-    node_d = Node(3, 6)
-    node_e = Node(9, 3)
-    node_f = Node(12, 6)
-    node_g = Node(9, 9)
-    node_h = Node(12, 9)
-    node_i = Node(15, 9)
-
-    links = [
-        Link(node_a, node_b),
-        Link(node_b, node_c),
-        Link(node_d, node_c),
-        Link(node_e, node_c),
-        Link(node_b, node_e),
-        Link(node_e, node_f),
-        Link(node_f, node_g),
-        Link(node_h, node_f),
-        Link(node_h, node_g),
-        Link(node_h, node_i)
-    ]
-    return Network(
-        [
-            node_a, node_b, node_c, node_d,
-            node_e, node_f, node_g, node_h, node_i
-        ],
-        links
-    )
-
-
 def triangle_network():
     node_a = Node(3, 3)
     node_b = Node(12, 6)
@@ -162,7 +118,55 @@ def all_networks():
         "horizontal line": horizontal_network(),
         "vertical line": vertical_network(),
         "whole network": whole_network()
-        # "labyrinth": labyrinth_network(),
-        # "concrete 1": conc1_network(),
-        # "explanatory 1": exp1_network()
+    }
+
+
+# --------------    Actuators   --------------
+
+
+def actuators_4():
+    east = Actuator('East', 0)
+    north = Actuator('North', 90)
+    west = Actuator(180, 'West')
+    south = Actuator('South', 270)
+    return [east, north, west, south]
+
+
+def actuators_8():
+    east = Actuator('East', 0)
+    north_east = Actuator('North-East', 45)
+    north = Actuator('North', 90)
+    north_west = Actuator('North-West', 135)
+    west = Actuator('West', 180)
+    south_west = Actuator('South-West', 225)
+    south = Actuator('South', 270)
+    south_east = Actuator('South-East', 315)
+    return [
+        east, north_east, north, north_west,
+        west, south_west, south, south_east]
+
+
+def actuators_9():
+    east = Actuator('East', 0)
+    north_east = Actuator('North-East', 45)
+    north = Actuator('North', 90)
+    north_west = Actuator('North-West', 135)
+    west = Actuator('West', 180)
+    south_west = Actuator('South-West', 225)
+    south = Actuator('South', 270)
+    south_east = Actuator('South-East', 315)
+    button = Button('center')
+    return [
+        east, north_east, north, north_west,
+        west, south_west, south, south_east, button]
+
+
+# --------------    Interactions   --------------
+
+
+def all_interactions():
+    return {
+        'HaptiQ': HaptiQInteract(),
+        'Voice': VoiceInteract(),
+        'Keyboard': KeyboardInteract()
     }
