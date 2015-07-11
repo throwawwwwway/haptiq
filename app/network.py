@@ -1,6 +1,6 @@
 import math
 
-from app.behavior import Behavior, NodeBehavior, LinkBehavior, Context
+# from app.behavior import Behavior, NodeBehavior, Context
 
 
 class Point(object):
@@ -21,21 +21,21 @@ class Point(object):
         return self.x > other.x and self.y > other.y
 
     def polar_coord_to(self, position):
-        distance = self._distance_to(position)
+        distance = self.distance_to(position)
         return {
-            'angle': self._angle_with(position, distance),
+            'angle': self.angle_with(position, distance),
             'distance': distance
         }
 
-    def _distance_to(self, point):
+    def distance_to(self, point):
         sq_dist_x = (self.x - point.x) ** 2
         sq_dist_y = (self.y - point.y) ** 2
         return math.sqrt(sq_dist_x + sq_dist_y)
 
-    def _angle_with(self, point, distance=None):
+    def angle_with(self, point, distance=None):
         # Using this formula cos(a) = opp/hyp
         opposite = self.y - point.y
-        hypot = self._distance_to(point) if distance is None else distance
+        hypot = self.distance_to(point) if distance is None else distance
         if (opposite == 0):
             return 0 if self.x < point.x else 180
         elif (hypot == 0):  # not tested
@@ -107,9 +107,6 @@ class Node(Point, NetworkElem):
     def __key(self):  # not tested
         return tuple(v for k, v in sorted(self.__dict__.items()))
 
-    def default_behavior(self):
-        return NodeBehavior()
-
 
 class Link(Line, NetworkElem):
 
@@ -128,62 +125,61 @@ class Link(Line, NetworkElem):
         perpendicular = self.get_perpendicular(point)
         closest_pt = self.get_intersection_point(perpendicular)
         if closest_pt.outbound(self.first, self.sec):
-            dist_w_first = point._distance_to(self.first)
-            dist_w_sec = point._distance_to(self.sec)
+            dist_w_first = point.distance_to(self.first)
+            dist_w_sec = point.distance_to(self.sec)
             closest_pt = self.first if dist_w_first <= dist_w_sec else self.sec
         return closest_pt.polar_coord_to(point)
 
     def directions(self, point):
         directions = []
-        if point._distance_to(self.first) > 10:
-            directions.append(self.first._angle_with(self.sec))
-        if point._distance_to(self.sec) > 10:
-            directions.append(self.sec._angle_with(self.first))
+        if point.distance_to(self.first) > 10:
+            directions.append(self.first.angle_with(self.sec))
+        if point.distance_to(self.sec) > 10:
+            directions.append(self.sec.angle_with(self.first))
         return directions
-
-    def default_behavior(self):
-        return LinkBehavior()
 
 
 class Network(object):
 
-    def __init__(self, nodes=[], links=[], raw=None):
-        self.raw = raw
-        self.elems = {e: (e.default_behavior(), []) for e in nodes + links}
+    def __init__(self, nodes=[], links=[]):
+        self.elems = nodes + links
+        # self.elems = {e: (e.default_behavior(), []) for e in nodes + links}
 
-    def apply_behaviors(self):
-        """
-            Apply for each network element the set behavior
-            to corresponding the actuators
-        """
+    def distances(self, point):
+        return {elem: elem.polar_coord_to(point) for elem in self.elems}
+    # def apply_behaviors(self):
+    #     """
+    #         Apply for each network element the set behavior
+    #         to corresponding the actuators
+    #     """
 
-        self.raw.reset_actuators()
-        for (behavior, actuators) in self.elems.values():
-            behavior.apply(actuators)
-        Behavior._iter += 1  # for syncing behavior
+    #     self.raw.reset_actuators()
+    #     for (behavior, actuators) in self.elems.values():
+    #         behavior.apply(actuators)
+    #     Behavior._iter += 1  # for syncing behavior
 
-    def update_behaviors(self):
-        """Update the behaviors"""
+    # def update_behaviors(self):
+    #     """Update the behaviors"""
 
-        sorted_keys = sorted(
-            self.elems,
-            key=lambda e: e.polar_coord_to(self.raw.position)['distance']
-        )
+    #     sorted_keys = sorted(
+    #         self.elems,
+    #         key=lambda e: e.polar_coord_to(self.raw.position)['distance']
+    #     )
 
-        for elem in sorted_keys:
-            coord = elem.polar_coord_to(self.raw.position)
-            context = Context.which(coord['distance'])
+    #     for elem in sorted_keys:
+    #         coord = elem.polar_coord_to(self.raw.position)
+    #         context = Context.which(coord['distance'])
 
-            (behavior, actuators) = self.elems[elem]
-            if context == Context.on:
-                if type(elem) == Node:
-                    actuators = self.raw.actuators
-                else:
-                    actuators = [
-                        self.raw.actuator_for_angle(direction)
-                        for direction in elem.directions(self.raw.position)
-                    ]
-            else:
-                actuators = [self.raw.actuator_for_angle(coord['angle'])]
-            behavior.update(context)
-            self.elems[elem] = (behavior, actuators)
+    #         (behavior, actuators) = self.elems[elem]
+    #         if context == Context.on:
+    #             if type(elem) == Node:
+    #                 actuators = self.raw.actuators
+    #             else:
+    #                 actuators = [
+    #                     self.raw.actuator_for_angle(direction)
+    #                     for direction in elem.directions(self.raw.position)
+    #                 ]
+    #         else:
+    #             actuators = [self.raw.actuator_for_angle(coord['angle'])]
+    #         behavior.update(context)
+    #         self.elems[elem] = (behavior, actuators)

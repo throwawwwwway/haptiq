@@ -4,9 +4,9 @@ import app.logconfig as lc
 
 def get_triangle(points):
 
-        ab = points[0]._distance_to(points[1])
-        ac = points[0]._distance_to(points[2])
-        bc = points[1]._distance_to(points[2])
+        ab = points[0].distance_to(points[1])
+        ac = points[0].distance_to(points[2])
+        bc = points[1].distance_to(points[2])
 
         if ab < ac and ab < bc:
             top, left, right = 2, 0, 1
@@ -55,7 +55,7 @@ class Handler(object):
                 (triangle['right'].x + triangle['left'].x) / 2,
                 (triangle['right'].y + triangle['left'].y) / 2,
             )
-            self.device.orientation = middle._angle_with(triangle['top'])
+            self.device.orientation = middle.angle_with(triangle['top'])
 
     def manage(self, points):
         if not self.waiting_update:

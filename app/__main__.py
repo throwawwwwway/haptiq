@@ -27,7 +27,7 @@ def interact(view):
             if view.interaction is not None and view.interaction.open():
                 current = view.interaction
             else:
-                time.sleep(5)
+                time.sleep(2)
 
 
 if __name__ == "__main__":
@@ -41,7 +41,9 @@ if __name__ == "__main__":
         device,
         networks=data.all_networks(),
         interacts=data.all_interactions(),
-        mouse_tracking=False
+        mouse_tracking=False,
+        default_network='triangle',
+        default_interact='HaptiQ'
     )
 
     # Setting tracking and interacting threadq

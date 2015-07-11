@@ -50,8 +50,11 @@ class View(object):
                     self.load_interaction, key)
                 interaction_menu.add_command(
                     label=key, command=partial_command)
-
         self.scene = Scene(self.root, device, 'mouse_tracking' in opts)
+        if 'default_network' in opts:
+            self.load_network(opts['default_network'])
+        if 'default_interact' in opts:
+            self.load_interaction(opts['default_interact'])
 
     @property
     def network(self):
@@ -61,7 +64,7 @@ class View(object):
     def network(self, value):
         self._network = value
         lc.log.info("network loaded")
-        self.scene.draw_network(self.network)
+        self.scene.draw_network(value)
 
     def load_network(self, key):
         self.network = self.networks[key]

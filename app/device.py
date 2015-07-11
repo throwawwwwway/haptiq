@@ -1,7 +1,6 @@
 import app.logconfig as lc
 
 from app.network import Point
-from app.actuator import Actuator
 
 
 class Device(object):
@@ -38,6 +37,10 @@ class Device(object):
             lc.log.debug("orientation is now: {}".format(str(value)))
             # TODO: self._orientation = value
 
+    def actuators_for(self, graph_elem):
+        directions = graph_elem.directions(self.position)
+        return [self.actuator_for_angle(angle) for angle in directions]
+
     def actuator_for_angle(self, angle):
         angle = (angle + 180 - self.orientation) % 360
         std_angle = self.actuators[1].angle - self.actuators[0].angle
@@ -51,4 +54,4 @@ class Device(object):
             actuator.level = level
 
     def reset_actuators(self):
-        self.set_all_at(Actuator.DEFAULT)
+        self.set_all_at(0)

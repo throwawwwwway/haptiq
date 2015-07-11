@@ -101,13 +101,13 @@ def two_nodes_network():
 def horizontal_network():
     a = Node(2, 8)
     b = Node(15, 8)
-    return Network([a, b], [Link(a, b)], [])
+    return Network([a, b], [Link(a, b)])
 
 
 def vertical_network():
     a = Node(7, 2)
     b = Node(7, 15)
-    return Network([a, b], [Link(a, b)], [])
+    return Network([a, b], [Link(a, b)])
 
 
 def all_networks():

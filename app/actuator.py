@@ -3,13 +3,12 @@ import app.logconfig as lc
 
 class Actuator(object):
     """ Actuator class represents the different actuators of the HaptiQ. """
-    DEFAULT = 10
 
     def __init__(self, name="actuator", angle=None):
         self.name = name
         self.angle = angle
         self._level = 0
-        lc.log.debug("Actuator {} for {}° created - {}".format(
+        lc.log.debug("Actuator {} for {} deg created - {}".format(
             name, str(self.angle), str(self.level)))
 
     def __str__(self):
@@ -25,9 +24,10 @@ class Actuator(object):
     @level.setter
     def level(self, level):
         if not isinstance(level, int) and not isinstance(level, float):
-            raise Exception("level should be int or float")
+            raise Exception("level must be int or float")
         elif level < 0 or level > 99:
-            lc.log.warning("level should be between 0 and 99")
+            lc.log.warning("level must be between 0 and 99: {}".format(
+                str(level)))
             level = 0
         self._level = level
 
