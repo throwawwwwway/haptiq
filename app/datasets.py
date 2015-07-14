@@ -14,8 +14,8 @@ def whole_network():
         [a, b, c, d, e, f, g, h, i, j],
         [
             Link(a, b), Link(a, c), Link(a, j), Link(b, d), Link(c, d),
-            Link(a, j), Link(d, h), Link(d, e), Link(e, f), Link(h, f),
-            Link(h, i), Link(j, g), Link(j, h)
+            Link(d, h), Link(d, e), Link(e, f), Link(h, i), Link(j, g),
+            Link(j, h), Link(h, e)
         ]
     )
 
