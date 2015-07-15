@@ -37,6 +37,9 @@ class Device(object):
             lc.log.debug("orientation is now: {}".format(str(value)))
             # TODO: self._orientation = value
 
+    def actuator_to(self, elem):
+        return self.actuator_for_angle(elem.angle_with(self.position))
+
     def actuators_for(self, graph_elem):
         directions = graph_elem.directions(self.position)
         return [self.actuator_for_angle(angle) for angle in directions]

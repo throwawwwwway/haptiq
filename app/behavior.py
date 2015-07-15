@@ -29,6 +29,6 @@ class Behavior(object):
         return self.sequence[Behavior._iter % len(self.sequence)]
 
     @staticmethod
-    def gen_oscillation(height, steps):
-        "Height is from bottom to top and steps can be seen as a frequency."
-        return [int(i - height / 2) for i in range(0, height + 1, steps)]
+    def gen_oscillation(start, end, steps):
+        return list(range(start, end, steps)) +\
+            list(range(start + steps, end + 1, steps))[::-1]

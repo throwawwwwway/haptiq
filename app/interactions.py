@@ -37,7 +37,8 @@ class HaptiQInteract(DefaultInteract):
 
     def open(self):
         super().open()
-        self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
+        self.to_apply = {
+            act: [Behavior([0])] for act in self.device.actuators}
         if DefaultInteract.SIMULATION:
             return True
         lc.log.debug("Trying opening serial")
@@ -77,7 +78,8 @@ class StableMapping(HaptiQInteract):
         super().__init__()
 
     def process(self):
-        self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
+        self.to_apply = {
+            act: [Behavior([0])] for act in self.device.actuators}
         # Fetch infos & build behaviors
         for node in self.view.network.nodes:
             if State.which(node.distance_to(self.device.position)) == State.on:
@@ -96,8 +98,7 @@ class OscillateMapping(HaptiQInteract):
         super().__init__()
 
     def process(self):
-        self.to_apply = {
-            act: [Behavior([0])] for act in self.device.actuators}
+        self.to_apply = {act: [Behavior()] for act in self.device.actuators}
         behavior = Behavior(
             list(range(0, 90, 10)) + list(range(10, 91, 10))[::-1])
         for node in self.view.network.nodes:
@@ -110,7 +111,47 @@ class OscillateMapping(HaptiQInteract):
                     self.to_apply[act].append(behavior)
         super().apply()
 
-# class Guidance(HaptiQInteract)
+
+class SimpleGuidance(HaptiQInteract):
+    def __init__(self):
+        super().__init__()
+
+    def process(self):
+        self.to_apply = {act: [Behavior()] for act in self.device.actuators}
+        prox_nd = None
+        for node in self.view.network.nodes:
+            if State.which(node.distance_to(self.device.position)) == State.on:
+                for act in self.device.actuators:
+                    self.to_apply[act].append(Behavior([44]))
+                prox_nd = None
+                break
+            elif node.closer_than(prox_nd, self.device.position):
+                prox_nd = node
+        if prox_nd is not None:
+            state = State.which(prox_nd.distance_to(self.device.position))
+            if state == State.cold:
+                seq = Behavior.gen_oscillation(0, 40, 5)
+            elif state == State.hot:
+                seq = Behavior.gen_oscillation(0, 40, 20)
+            else:
+                seq = [0]
+            self.to_apply[self.device.actuator_to(prox_nd)].append(
+                Behavior(seq))
+        for link in self.view.network.links:
+            if State.which(link.distance_to(self.device.position)) == State.on:
+                for act in self.device.actuators_for(link):
+                    self.to_apply[act].append(Behavior([44]))
+        super().apply()
+
+
+class ComplexGuidance(HaptiQInteract):
+    def __init__(self):
+        super().__init__()
+
+    def process(self):
+        pass
+
+
 # class OscillateMapping(HaptiQInteract):
 #     def __init__(self):
 #         super().__init__()

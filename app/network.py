@@ -49,6 +49,9 @@ class Point(object):
         return (self.x < min(pt_a.x, pt_b.x) or self.x > max(pt_a.x, pt_b.x) or
                 self.y < min(pt_a.y, pt_b.y) or self.y > max(pt_a.y, pt_b.y))
 
+    def closer_than(self, other, pt):
+        return other is None or (self.distance_to(pt) <= other.distance_to(pt))
+
 
 class Line(object):
 
