@@ -130,6 +130,15 @@ class Link(Line, NetworkElem):
             closest_pt = self.first if dist_w_first <= dist_w_sec else self.sec
         return closest_pt.polar_coord_to(point)
 
+    def distance_to(self, point):
+        perpendicular = self.get_perpendicular(point)
+        closest_pt = self.get_intersection_point(perpendicular)
+        if closest_pt.outbound(self.first, self.sec):
+            dist_w_first = point.distance_to(self.first)
+            dist_w_sec = point.distance_to(self.sec)
+            closest_pt = self.first if dist_w_first <= dist_w_sec else self.sec
+        return closest_pt.distance_to(point)
+
     def directions(self, point):
         directions = []
         if point.distance_to(self.first) > 10:
@@ -142,11 +151,16 @@ class Link(Line, NetworkElem):
 class Network(object):
 
     def __init__(self, nodes=[], links=[]):
-        self.elems = nodes + links
+        self.nodes = nodes
+        self.links = links
         # self.elems = {e: (e.default_behavior(), []) for e in nodes + links}
 
-    def distances(self, point):
-        return {elem: elem.polar_coord_to(point) for elem in self.elems}
+    # def distances(self, point):
+    #     return (
+    #         {elem: elem.polar_coord_to(point) for elem in self.elems}
+    #     )
+    #     return
+
     # def apply_behaviors(self):
     #     """
     #         Apply for each network element the set behavior

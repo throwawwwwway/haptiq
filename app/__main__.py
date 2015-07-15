@@ -43,7 +43,7 @@ if __name__ == "__main__":
         interacts=data.all_interactions(),
         mouse_tracking=False,
         default_network='triangle',
-        default_interact='HaptiQ'
+        default_interact='HaptiQ_oscillate_mapping'
     )
 
     # Setting tracking and interacting threadq

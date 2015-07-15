@@ -1,11 +1,6 @@
 from enum import Enum
 
 
-def gen_oscillation(height, steps):
-    "Height is from bottom to top and steps can be seen as a frequency."
-    return [i - height / 2 for i in range(0, height + 1, steps)]
-
-
 class State(Enum):
     on, hot, cold, outrange = 1, 2, 3, 4
 
@@ -32,3 +27,8 @@ class Behavior(object):
 
     def next(self):
         return self.sequence[Behavior._iter % len(self.sequence)]
+
+    @staticmethod
+    def gen_oscillation(height, steps):
+        "Height is from bottom to top and steps can be seen as a frequency."
+        return [int(i - height / 2) for i in range(0, height + 1, steps)]

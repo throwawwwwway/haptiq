@@ -3,7 +3,6 @@ import app.logconfig as lc
 
 from tkinter import Canvas, Menu
 from app.device import Point
-from app.network import Node, Link
 from functools import partial
 
 
@@ -124,17 +123,16 @@ class Scene(object):
     def draw_network(self, network):
         self.explore_canvas.delete('all')
         self.enable_position_feedback()
-        for elem in network.elems:
-            if type(elem) is Node:
-                pos_x = elem.x - 5
-                pos_y = elem.y - 5
-                self.explore_canvas.create_oval(
-                    pos_x, pos_y, pos_x + 10, pos_y + 10, fill="blue")
-            elif type(elem) is Link:
-                pt_a = elem.first
-                pt_b = elem.sec
-                self.explore_canvas.create_line(
-                    pt_a.x, pt_a.y, pt_b.x, pt_b.y)
+        for node in network.nodes:
+            pos_x = node.x - 5
+            pos_y = node.y - 5
+            self.explore_canvas.create_oval(
+                pos_x, pos_y, pos_x + 10, pos_y + 10, fill="blue")
+        for link in network.links:
+            pt_a = link.first
+            pt_b = link.sec
+            self.explore_canvas.create_line(
+                pt_a.x, pt_a.y, pt_b.x, pt_b.y)
 
     def update(self):
         coords = self.explore_canvas.coords(self.device_cursor)

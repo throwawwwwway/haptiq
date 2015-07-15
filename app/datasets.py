@@ -1,7 +1,7 @@
 from app.network import Node, Link, Network
 from app.actuator import Actuator, Button
-from app.interactions import HaptiQInteract, VoiceInteract, KeyboardInteract
-
+from app.interactions import StableMapping, VoiceInteract,\
+    KeyboardInteract, OscillateMapping
 
 # --------------    Networks   --------------
 
@@ -166,7 +166,8 @@ def actuators_9():
 
 def all_interactions():
     return {
-        'HaptiQ': HaptiQInteract(),
+        'HaptiQ_stable_mapping': StableMapping(),
+        'HaptiQ_oscillate_mapping': OscillateMapping(),
         'Voice': VoiceInteract(),
         'Keyboard': KeyboardInteract()
     }

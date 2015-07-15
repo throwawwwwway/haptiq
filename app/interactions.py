@@ -3,7 +3,7 @@ import time
 import os
 
 import app.logconfig as lc
-from app.network import Node, Link
+# from app.network import Node, Link
 from app.behavior import Behavior, State
 
 
@@ -49,30 +49,16 @@ class HaptiQInteract(DefaultInteract):
             return False
         return True
 
-    def process(self):
-        self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
-        # Fetch infos
-        context = self.view.network.distances(self.device.position)
-        under = {
-            elem: context[elem] for elem in context if (
-                State.which(context[elem]['distance']) == State.on)
-        }
-        # Build behaviors
-        for elem in under:
-            if type(elem) == Node:
-                for act in self.to_apply:
-                    self.to_apply[act].append(Behavior([45]))
-            elif type(elem) == Link:
-                for act in self.device.actuators_for(elem):
-                    self.to_apply[act].append(Behavior([45]))
-        # Apply
+    def apply(self,):
         for act in self.device.actuators:
             if act in self.to_apply:
                 n_level = sum([b.next() for b in self.to_apply[act]])
                 if n_level != act.level:
                     act.level = n_level
                     msg = 's{}{}f'.format(
-                        str(self.device.actuators.index(act)), str(act.level))
+                        str(self.device.actuators.index(act)),
+                        str(act.level).zfill(2)
+                    )
                     lc.log.debug("serial sending: " + msg)
                     if not DefaultInteract.SIMULATION:
                         self.ser.write(bytes(msg, 'UTF-8'))
@@ -80,8 +66,76 @@ class HaptiQInteract(DefaultInteract):
         time.sleep(0.1)
 
     def close(self):
+        if DefaultInteract.SIMULATION:
+            return True
         self.ser.close()
         lc.log.debug("Closing HaptiQ interaction")
+
+
+class StableMapping(HaptiQInteract):
+    def __init__(self):
+        super().__init__()
+
+    def process(self):
+        self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
+        # Fetch infos & build behaviors
+        for node in self.view.network.nodes:
+            if State.which(node.distance_to(self.device.position)) == State.on:
+                for act in self.device.actuators:
+                    self.to_apply[act].append(Behavior([45]))
+                break
+        for link in self.view.network.links:
+            if State.which(link.distance_to(self.device.position)) == State.on:
+                for act in self.device.actuators_for(link):
+                    self.to_apply[act].append(Behavior([45]))
+        super().apply()
+
+
+class OscillateMapping(HaptiQInteract):
+    def __init__(self):
+        super().__init__()
+
+    def process(self):
+        self.to_apply = {
+            act: [Behavior([0])] for act in self.device.actuators}
+        behavior = Behavior(
+            list(range(0, 90, 10)) + list(range(10, 91, 10))[::-1])
+        for node in self.view.network.nodes:
+            if State.which(node.distance_to(self.device.position)) == State.on:
+                behavior = Behavior([99])
+                break
+        for link in self.view.network.links:
+            if State.which(link.distance_to(self.device.position)) == State.on:
+                for act in self.device.actuators_for(link):
+                    self.to_apply[act].append(behavior)
+        super().apply()
+
+# class Guidance(HaptiQInteract)
+# class OscillateMapping(HaptiQInteract):
+#     def __init__(self):
+#         super().__init__()
+
+#     def process(self):
+#        self.to_apply = {act: [Behavior([0])] for act in self.device.actuators
+#         context = self.view.network.distances(self.device.position)
+#         acts = []
+#         on_node = False
+#         for elem in context:
+#             if (type(elem) == Node and
+#                     State.which(context[elem]['distance']) == State.on):
+#                 on_node = True
+#             elif :
+
+#             if type(elem) == Link
+#         s_elems = sorted(
+#             context, key=lambda e: (group(e), context[e]['distance']))
+
+#         else:
+
+
+#         context = self.view.network.distances(self.device.position)
+#         node = [elem for elem in context if (type(elem) == Node and
+#                 State.which(context[elem]['distance']) == State.on)]
 
 
 class VoiceInteract(DefaultInteract):
