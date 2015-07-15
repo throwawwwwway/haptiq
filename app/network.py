@@ -150,53 +150,12 @@ class Link(Line, NetworkElem):
             directions.append(self.sec.angle_with(self.first))
         return directions
 
+    def closer_than(self, other, pt):
+        return other is None or (self.distance_to(pt) <= other.distance_to(pt))
+
 
 class Network(object):
 
     def __init__(self, nodes=[], links=[]):
         self.nodes = nodes
         self.links = links
-        # self.elems = {e: (e.default_behavior(), []) for e in nodes + links}
-
-    # def distances(self, point):
-    #     return (
-    #         {elem: elem.polar_coord_to(point) for elem in self.elems}
-    #     )
-    #     return
-
-    # def apply_behaviors(self):
-    #     """
-    #         Apply for each network element the set behavior
-    #         to corresponding the actuators
-    #     """
-
-    #     self.raw.reset_actuators()
-    #     for (behavior, actuators) in self.elems.values():
-    #         behavior.apply(actuators)
-    #     Behavior._iter += 1  # for syncing behavior
-
-    # def update_behaviors(self):
-    #     """Update the behaviors"""
-
-    #     sorted_keys = sorted(
-    #         self.elems,
-    #         key=lambda e: e.polar_coord_to(self.raw.position)['distance']
-    #     )
-
-    #     for elem in sorted_keys:
-    #         coord = elem.polar_coord_to(self.raw.position)
-    #         context = Context.which(coord['distance'])
-
-    #         (behavior, actuators) = self.elems[elem]
-    #         if context == Context.on:
-    #             if type(elem) == Node:
-    #                 actuators = self.raw.actuators
-    #             else:
-    #                 actuators = [
-    #                     self.raw.actuator_for_angle(direction)
-    #                     for direction in elem.directions(self.raw.position)
-    #                 ]
-    #         else:
-    #             actuators = [self.raw.actuator_for_angle(coord['angle'])]
-    #         behavior.update(context)
-    #         self.elems[elem] = (behavior, actuators)

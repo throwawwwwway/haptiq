@@ -43,7 +43,7 @@ if __name__ == "__main__":
         interacts=data.all_interactions(),
         mouse_tracking=False,
         default_network='triangle',
-        default_interact='HaptiQ_simple_guidance'
+        default_interact='HaptiQ_complex_guidance'
     )
 
     # Setting tracking and interacting threadq

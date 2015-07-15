@@ -38,7 +38,8 @@ class Device(object):
             # TODO: self._orientation = value
 
     def actuator_to(self, elem):
-        return self.actuator_for_angle(elem.angle_with(self.position))
+        coord = elem.polar_coord_to(self.position)
+        return self.actuator_for_angle(coord['angle'])
 
     def actuators_for(self, graph_elem):
         directions = graph_elem.directions(self.position)
