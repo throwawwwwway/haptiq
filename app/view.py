@@ -49,7 +49,8 @@ class View(object):
                     self.load_interaction, key)
                 interaction_menu.add_command(
                     label=key, command=partial_command)
-        self.scene = Scene(self.root, device, 'mouse_tracking' in opts)
+        mouse_tracking = opts['mouse_tracking'] if 'mouse_tracking' in opts else False
+        self.scene = Scene(self.root, device, mouse_tracking)
         if 'default_network' in opts:
             self.load_network(opts['default_network'])
         if 'default_interact' in opts:

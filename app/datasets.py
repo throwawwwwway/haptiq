@@ -6,6 +6,150 @@ from app.interactions import StableMapping, VoiceInteract,\
 # --------------    Networks   --------------
 
 
+def a1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    e, f, g = Node(11, 6), Node(9, 8), Node(11, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, g), Link(e, f)
+        ]
+    )
+
+
+def a2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    e, f, g = Node(8, 9), Node(10, 7), Node(11, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, g), Link(e, f)
+        ]
+    )
+
+
+def b1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(10, 4)
+    e, f, g = Node(8, 6), Node(5, 6), Node(7, 8)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(b, d),
+            Link(d, e), Link(e, f), Link(f, g)
+        ]
+    )
+
+
+def b2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(10, 4)
+    e, f, g = Node(8, 6), Node(10, 8), Node(7, 8)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(b, d),
+            Link(d, e), Link(e, f), Link(f, g)
+        ]
+    )
+
+
+def c1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    e, f, g = Node(10, 8), Node(5, 6), Node(5, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(d, f), Link(f, g)
+        ]
+    )
+
+
+def c2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    e, f, g = Node(10, 8), Node(8, 9), Node(5, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(d, f), Link(f, g)
+        ]
+    )
+
+
+def d1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(4, 7)
+    e, f, g = Node(6, 9), Node(8, 7), Node(9, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, f), Link(e, g)
+        ]
+    )
+
+
+def d2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(6, 6)
+    e, f, g = Node(6, 9), Node(8, 7), Node(9, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, f), Link(e, g)
+        ]
+    )
+
+
+def e1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(4, 7)
+    e, f, g = Node(6, 9), Node(3, 9), Node(9, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, f), Link(e, g)
+        ]
+    )
+
+
+def e2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(6, 6)
+    e, f, g = Node(6, 9), Node(3, 9), Node(9, 9)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(e, f), Link(e, g)
+        ]
+    )
+
+
+def f1():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(5, 6), Node(8, 6)
+    e, f, g = Node(11, 6), Node(6, 8), Node(9, 8)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(d, f), Link(f, g)
+        ]
+    )
+
+
+def f2():
+    a, b, c, d = Node(7, 1), Node(7, 4), Node(5, 6), Node(5, 9)
+    e, f, g = Node(8, 9), Node(3, 11), Node(6, 11)
+    return Network(
+        [a, b, c, d, e, f, g],
+        [
+            Link(a, b), Link(b, c), Link(c, d),
+            Link(d, e), Link(d, f), Link(f, g)
+        ]
+    )
+
+
 def whole_network():
     a, b, c, d = Node(3, 4), Node(10.5, 4), Node(6, 8), Node(10.5, 8)
     e, f, g, h = Node(16.5, 8), Node(18, 6), Node(3, 16), Node(13.5, 12)
@@ -99,14 +243,14 @@ def two_nodes_network():
 
 
 def horizontal_network():
-    a = Node(2, 8)
-    b = Node(15, 8)
+    a = Node(6, 8)
+    b = Node(10, 8)
     return Network([a, b], [Link(a, b)])
 
 
 def vertical_network():
-    a = Node(7, 2)
-    b = Node(7, 15)
+    a = Node(8, 6)
+    b = Node(8, 10)
     return Network([a, b], [Link(a, b)])
 
 
@@ -117,7 +261,19 @@ def all_networks():
         "triangle": triangle_network(),
         "horizontal line": horizontal_network(),
         "vertical line": vertical_network(),
-        "whole network": whole_network()
+        "whole network": whole_network(),
+        "A1": a1(),
+        "A2": a2(),
+        "B1": b1(),
+        "B2": b2(),
+        "C1": c1(),
+        "C2": c2(),
+        "D1": d1(),
+        "D2": d2(),
+        "E1": e1(),
+        "E2": e2(),
+        "F1": f1(),
+        "F2": f2()
     }
 
 

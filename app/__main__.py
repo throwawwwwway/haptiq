@@ -41,9 +41,9 @@ if __name__ == "__main__":
         device,
         networks=data.all_networks(),
         interacts=data.all_interactions(),
-        mouse_tracking=False,
-        default_network='triangle',
-        default_interact='HaptiQ_complex_guidance'
+        mouse_tracking=True,
+        default_network='C1',
+        default_interact='HaptiQ_stable_mapping'
     )
 
     # Setting tracking and interacting threadq
@@ -51,7 +51,7 @@ if __name__ == "__main__":
     interaction_thrd = threading.Thread(target=interact, args=(view,))
 
     # Starting threads
-    # tracker_thrd.start()
+    tracker_thrd.start()
     interaction_thrd.start()
 
     view.loop()  # runs the view, forever
