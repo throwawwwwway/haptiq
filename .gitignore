@@ -48,3 +48,4 @@ Temporary Items
 activity.log*
 tmp*
 report/gen
+report/*.docx
