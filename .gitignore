@@ -49,3 +49,4 @@ activity.log*
 tmp*
 report/gen
 report/*.docx
+log/*

@@ -12,7 +12,7 @@ formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
 # formatter = logging.Formatter('%(levelname)s :: %(message)s')
 
 # specify file handler in 'append' mode with 1Mo size and backup
-file_handler = RotatingFileHandler('activity.log', 'a', 1000000, 1)
+file_handler = RotatingFileHandler('log/activity.log', 'a', 1000000, 1)
 # set the level of which to register in the file
 file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
