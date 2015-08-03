@@ -8,13 +8,13 @@ log = logging.getLogger()
 # setting the lowest loggin level (DEBUG <-> everything)
 log.setLevel(logging.DEBUG)
 # formating logs
-# formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
-formatter = logging.Formatter('%(levelname)s :: %(message)s')
+formatter = logging.Formatter('%(asctime)s :: %(levelname)s :: %(message)s')
+# formatter = logging.Formatter('%(levelname)s :: %(message)s')
 
 # specify file handler in 'append' mode with 1Mo size and backup
 file_handler = RotatingFileHandler('activity.log', 'a', 1000000, 1)
 # set the level of which to register in the file
-file_handler.setLevel(logging.WARNING)
+file_handler.setLevel(logging.INFO)
 file_handler.setFormatter(formatter)
 
 # attach the handler to our loggin object

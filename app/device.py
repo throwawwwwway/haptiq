@@ -22,7 +22,7 @@ class Device(object):
     @position.setter
     def position(self, value):
         if value != self._position:
-            # lc.log.debug("position is now: {}".format(str(value)))
+            lc.log.info("position: {}".format(str(value)))
             self._position = value
 
     @property
@@ -34,8 +34,8 @@ class Device(object):
         # default orientation is north, calculation are based on easy -> 90°
         value = (value - 90) % 360
         if value != self.orientation:
-            lc.log.debug("orientation is now: {}".format(str(value)))
             # TODO: self._orientation = value
+            pass
 
     def actuator_to(self, elem):
         coord = elem.polar_coord_to(self.position)

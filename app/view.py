@@ -34,7 +34,7 @@ class View(object):
         if self.networks != []:
             newtwork_menu = Menu(menubar)
             menubar.add_cascade(label="Networks", menu=newtwork_menu)
-            for key, network in self.networks.items():
+            for key, network in sorted(self.networks.items()):
                 partial_command = partial(self.load_network, key)
                 newtwork_menu.add_command(
                     label=key, command=partial_command)
@@ -42,7 +42,7 @@ class View(object):
         if self.interacts != []:
             interaction_menu = Menu(menubar)
             menubar.add_cascade(label="Interactions", menu=interaction_menu)
-            for key, interaction in self.interacts.items():
+            for key, interaction in sorted(self.interacts.items()):
                 interaction.device = device
                 interaction.view = self
                 partial_command = partial(
@@ -63,10 +63,10 @@ class View(object):
     @network.setter
     def network(self, value):
         self._network = value
-        lc.log.info("network loaded")
         self.scene.draw_network(value)
 
     def load_network(self, key):
+        lc.log.info("network: {}".format(key))
         self.network = self.networks[key]
 
     @property
@@ -76,11 +76,9 @@ class View(object):
     @interaction.setter
     def interaction(self, value):
         self._interaction = value
-        lc.log.info("interaction loaded")
-        # self.scene.refresh_interaction()
 
     def load_interaction(self, key):
-        lc.log.info("interaction loaded")
+        lc.log.info("interaction: {}".format(key))
         self.interaction = self.interacts[key]
 
     def on_exit(self):

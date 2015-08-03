@@ -8,7 +8,7 @@ from app.behavior import Behavior, State
 
 
 class DefaultInteract(object):
-    SIMULATION = False
+    SIMULATION = True
 
     def __init__(self):
         self.device = None
@@ -29,8 +29,8 @@ class DefaultInteract(object):
 
 
 class HaptiQInteract(DefaultInteract):
-    SERIAL_PATH = '/dev/cu.usbmodem1411'
-    # SERIAL_PATH = '/dev/cu.HC-06-DevB'
+    # SERIAL_PATH = '/dev/cu.usbmodem1411'
+    SERIAL_PATH = '/dev/cu.DrAdrien-DevB'
 
     def __init__(self):
         super().__init__()
@@ -46,6 +46,7 @@ class HaptiQInteract(DefaultInteract):
         try:
             self.ser = serial.Serial(
                 HaptiQInteract.SERIAL_PATH, baudrate=115200, timeout=0)
+            lc.log.info("Serial openned")
         except:
             lc.log.warning("Cannot open serial communication.")
             return False
@@ -65,13 +66,14 @@ class HaptiQInteract(DefaultInteract):
                     if not DefaultInteract.SIMULATION:
                         self.ser.write(bytes(msg, 'UTF-8'))
         Behavior._iter += 1
+        lc.log.info(', '.join([str(act) for act in self.device.actuators]))
         time.sleep(0.25)
 
     def close(self):
         if DefaultInteract.SIMULATION:
             return True
         self.ser.close()
-        lc.log.debug("Closing HaptiQ interaction")
+        lc.log.info("Serial closed")
 
 
 class StableMapping(HaptiQInteract):

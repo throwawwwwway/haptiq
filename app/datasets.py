@@ -1,152 +1,118 @@
 from app.network import Node, Link, Network
 from app.actuator import Actuator, Button
-from app.interactions import StableMapping, VoiceInteract,\
+from app.interactions import DefaultInteract, StableMapping, VoiceInteract,\
     KeyboardInteract, OscillateMapping, SimpleGuidance, ComplexGuidance
 
 # --------------    Networks   --------------
 
 
 def a1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    c, d = Node(10, 4), Node(8, 6)
     e, f, g = Node(11, 6), Node(9, 8), Node(11, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, g), Link(e, f)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, g), Link(e, f)]
     )
 
 
 def a2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    c, d = Node(10, 4), Node(8, 6)
     e, f, g = Node(8, 9), Node(10, 7), Node(11, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, g), Link(e, f)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, g), Link(e, f)]
     )
 
 
 def b1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(10, 4)
-    e, f, g = Node(8, 6), Node(5, 6), Node(7, 8)
+    a, b = Node(7 + 3, 1 + 3), Node(7 + 3, 4 + 3)
+    c, d = Node(4 + 3, 4 + 3), Node(10 + 3, 4 + 3)
+    e = Node(8 + 3, 6 + 3)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(b, d),
-            Link(d, e), Link(e, f), Link(f, g)
-        ]
+        [a, b, c, d, e],
+        [Link(a, b), Link(b, c), Link(b, d), Link(d, e)]
     )
 
 
 def b2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(10, 4)
-    e, f, g = Node(8, 6), Node(10, 8), Node(7, 8)
+    a, b = Node(7 + 3, 1 + 3), Node(7 + 3, 4 + 3)
+    c, d = Node(4 + 3, 4 + 3), Node(10 + 3, 4 + 3)
+    e = Node(10 + 3, 7 + 3)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(b, d),
-            Link(d, e), Link(e, f), Link(f, g)
-        ]
+        [a, b, c, d, e],
+        [Link(a, b), Link(b, c), Link(b, d), Link(d, e)]
     )
 
 
 def c1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    c, d = Node(10, 4), Node(8, 6)
     e, f, g = Node(10, 8), Node(5, 6), Node(5, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(d, f), Link(f, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(d, f), Link(f, g)]
     )
 
 
 def c2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(10, 4), Node(8, 6)
+    c, d = Node(10, 4), Node(8, 6)
     e, f, g = Node(10, 8), Node(8, 9), Node(5, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(d, f), Link(f, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(d, f), Link(f, g)]
     )
 
 
 def d1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(4, 7)
-    e, f, g = Node(6, 9), Node(8, 7), Node(9, 9)
+    c, d = Node(4 + 3, 4), Node(4 + 3, 7)
+    e, f, g = Node(6 + 3, 9), Node(8 + 3, 7), Node(9 + 3, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, f), Link(e, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, f), Link(e, g)]
     )
 
 
 def d2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(6, 6)
-    e, f, g = Node(6, 9), Node(8, 7), Node(9, 9)
+    c, d = Node(4 + 3, 4), Node(6 + 3, 6)
+    e, f, g = Node(6 + 3, 9), Node(8 + 3, 7), Node(9 + 3, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, f), Link(e, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, f), Link(e, g)]
     )
 
 
 def e1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(4, 7)
-    e, f, g = Node(6, 9), Node(3, 9), Node(9, 9)
+    c, d = Node(4 + 4, 4), Node(4 + 4, 7)
+    e, f, g = Node(6 + 4, 9), Node(3 + 4, 9), Node(9 + 4, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, f), Link(e, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, f), Link(e, g)]
     )
 
 
 def e2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(4, 4), Node(6, 6)
-    e, f, g = Node(6, 9), Node(3, 9), Node(9, 9)
+    c, d = Node(4 + 4, 4), Node(6 + 4, 6)
+    e, f, g = Node(6 + 4, 9), Node(3 + 4, 9), Node(9 + 4, 9)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(e, f), Link(e, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(e, f), Link(e, g)]
     )
 
 
 def f1():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(5, 6), Node(8, 6)
-    e, f, g = Node(11, 6), Node(6, 8), Node(9, 8)
+    c, d = Node(7, 6), Node(10, 6)
+    e, f, g = Node(13, 6), Node(8, 8), Node(11, 8)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(d, f), Link(f, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(d, f), Link(f, g)]
     )
 
 
 def f2():
-    a, b, c, d = Node(7, 1), Node(7, 4), Node(5, 6), Node(5, 9)
-    e, f, g = Node(8, 9), Node(3, 11), Node(6, 11)
+    c, d = Node(10, 3), Node(10, 6)
+    e, f, g = Node(8 + 5, 6), Node(3 + 5, 8), Node(6 + 5, 8)
     return Network(
-        [a, b, c, d, e, f, g],
-        [
-            Link(a, b), Link(b, c), Link(c, d),
-            Link(d, e), Link(d, f), Link(f, g)
-        ]
+        [c, d, e, f, g],
+        [Link(c, d), Link(d, e), Link(d, f), Link(f, g)]
     )
 
 
@@ -249,8 +215,8 @@ def horizontal_network():
 
 
 def vertical_network():
-    a = Node(8, 6)
-    b = Node(8, 10)
+    a = Node(10, 6)
+    b = Node(10, 10)
     return Network([a, b], [Link(a, b)])
 
 
@@ -273,7 +239,8 @@ def all_networks():
         "E1": e1(),
         "E2": e2(),
         "F1": f1(),
-        "F2": f2()
+        "F2": f2(),
+        "default": Network()
     }
 
 
@@ -327,5 +294,6 @@ def all_interactions():
         'HaptiQ_simple_guidance': SimpleGuidance(),
         'HaptiQ_complex_guidance': ComplexGuidance(),
         'Voice': VoiceInteract(),
-        'Keyboard': KeyboardInteract()
+        'Keyboard': KeyboardInteract(),
+        'default': DefaultInteract(),
     }
