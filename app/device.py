@@ -42,6 +42,8 @@ class Device(object):
         return self.actuator_for_angle(coord['angle'])
 
     def actuators_for(self, graph_elem):
+        if graph_elem is None:
+            return []
         directions = graph_elem.directions(self.position)
         return [self.actuator_for_angle(angle) for angle in directions]
 

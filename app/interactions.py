@@ -67,7 +67,7 @@ class HaptiQInteract(DefaultInteract):
                         self.ser.write(bytes(msg, 'UTF-8'))
         Behavior._iter += 1
         lc.log.info(', '.join([str(act) for act in self.device.actuators]))
-        time.sleep(0.25)
+        time.sleep(0.2)
 
     def close(self):
         if DefaultInteract.SIMULATION:
@@ -76,41 +76,29 @@ class HaptiQInteract(DefaultInteract):
         lc.log.info("Serial closed")
 
 
-class StableMapping(HaptiQInteract):
-    def __init__(self):
-        super().__init__()
-
-    def process(self):
-        self.to_apply = {
-            act: [Behavior([0])] for act in self.device.actuators}
-        # Fetch infos & build behaviors
-        for node in self.view.network.nodes:
-            if State.which(node.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators:
-                    self.to_apply[act].append(Behavior([20]))
-                break
-        for link in self.view.network.links:
-            if State.which(link.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators_for(link):
-                    self.to_apply[act].append(Behavior([79]))
-        super().apply()
-
-
 class OscillateMapping(HaptiQInteract):
     def __init__(self):
         super().__init__()
 
     def process(self):
         self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
-        behavior = Behavior(Behavior.gen_oscillation(0, 90, 10))
-        for node in self.view.network.nodes:
-            if State.which(node.distance_to(self.device.position)) == State.on:
-                behavior = Behavior([99])
-                break
-        for link in self.view.network.links:
-            if State.which(link.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators_for(link):
-                    self.to_apply[act].append(behavior)
+        pos = self.device.position
+        node_under = next((nd for nd in self.view.network.nodes if State.which(
+            nd.distance_to(pos)) == State.on), None)
+        lnks_under = [lk for lk in self.view.network.links if State.which(
+            lk.distance_to(pos)) == State.on]
+        if node_under:
+            for lk in lnks_under:
+                for act in self.device.actuators_for(lk):
+                    self.to_apply[act].append(Behavior([99]))
+        else:
+            cl = None  # closest link
+            for lk in lnks_under:
+                if lk.closer_than(cl, pos):
+                    cl = lk
+            for act in self.device.actuators_for(cl):
+                self.to_apply[act].append(
+                    Behavior(Behavior.gen_oscillation(0, 90, 10)))
         super().apply()
 
 

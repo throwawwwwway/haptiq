@@ -41,10 +41,11 @@ class Handler(object):
         for pt in self.points.values():
             x += pt.x
             y += pt.y
-        self.device.position = Point(
-            int(x / n_pts * self.width),
-            int(y / n_pts * self.height)
-        )
+        if x != 0 and y != 0:
+            self.device.position = Point(
+                int(x / n_pts * self.width),
+                int(y / n_pts * self.height)
+            )
 
     def update_orientation(self):
         triangle = get_triangle(list(self.points.values()))
