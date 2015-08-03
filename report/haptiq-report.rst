@@ -3,6 +3,7 @@ HaptiQ: a haptic tracking device with vectorial guidance for graph exploration
 ******************************************************************************
 
 .. 150 words
+
 Abstract
 ========
 
@@ -14,6 +15,7 @@ Keywords
 
 
 .. 2p
+
 Introduction
 ============
 
@@ -24,19 +26,30 @@ Braille - which is considered to be the most used form of tactile graphics, is b
 More and more data is being produced, this comes with dedicated jobs like Data Analysts and dedicated research like Information visualisation. The increase of research activity in this field has been substential over the last 20 years. We are in the age of Big Data with challenges for a better understanding, visualisation, sharing; yet, accessibility tends to be neglicted.
 
 In the laboratory of the SACHI team in St Andrews - Scotland, a small haptic device has been developed: the Haptic Tabletop Puck (HTP). By moving this special mouse, the user receives haptic feedbacks which can be used for exploration. Although this device allows multiple interactions, the main issue is that there is a single actuator for mapping the height of what is under. The way to explore would be to *bump* onto the limits.
-If we were to build another device that would allow multiple feedbacks, we would have a more efficient exploration; users would feel where to go. If we were to have longer segment instead of single point under the palms, the users could follow directions. Such a device could be a first window in the accessibility of graphs exploration for visually impaired people as the interaction techniques would be purely tactile. Furtheremore, the audio media is heavily used for accessibility and developing other interaction contributes in the 
+If we were to build another device that would allow multiple feedbacks, we would have a more efficient exploration; users would feel where to go. If we were to have longer segment instead of single point under the palms, the users could follow directions. Such a device could be a first window in the accessibility of graphs exploration for visually impaired people as the interaction techniques would be purely tactile. Furtheremore, the audio channel is heavily used for accessibility and developing other interaction contributes in the global autonomy of visually impaired people.
 
 The HaptiQ project aims to design and evaluate an inexpensive haptic device that allows blind users to acquire the representation of graphs and therefore, the key to the understanding of spatial information - like maps, or abstract concepts - like organigrams. The project is framed by Dr Nacenta (St Andrews, UK) and Dr Jouffrais (Toulouse, FR).
 
 I will present in this report the main steps that has led to the creation of this device. I will explain the starting context of the project and the analysing phase; then the design decisions made for this project followed by the way I have implemented them. Finally, I will explain the methods used for the evaluation and an ending discussion about the results and a personal feedback on the skills in human-computer interactions that has been employed for this project.
 
 .. 3p
+
 Context
 =======
 
 About accessibility
 -------------------
 
+Given the 10th International Statistical Classification of Diseases and Related Health Problems, there is 4 categories:
+
+	- normal vision
+	- moderate visual impairment
+	- severe visual impairment
+	- blindness
+
+Visual impairment includes the last two and it concerns 285 millions of people worldwide
+
+Blind is defined to be 
 Look for Cherchonspourvoir
 
 About work environments
@@ -57,6 +70,7 @@ Produce something that is cheap
 
 
 .. 8p
+
 Analyse
 =======
 
@@ -68,6 +82,7 @@ In-field observation
 
 
 .. 8p
+
 Design
 ======
 
@@ -85,6 +100,7 @@ Design of the interactions
 
 
 .. 8p
+
 Implementation
 ==============
 
@@ -99,6 +115,7 @@ Final state
 
 
 .. 7p
+
 Evaluation
 ==========
 
@@ -113,6 +130,7 @@ Results
 
 
 .. 3p
+
 Discussion
 ==========
 
@@ -125,6 +143,7 @@ Acquired skills
 
 
 .. 1p
+
 Conclusion
 ==========
 
@@ -141,56 +160,65 @@ This report has also been emphasizing the development side of the internship on 
 
 The work becomes research once the last sentence of the report written. Like, problem we allow people using results, but how about the device itself? Research can also consider the fact of making your project redoable.
 
+Want to learn about `my favorite programming language`_?
+
+.. _my favorite programming language:
+
+yeah sure!
+
+Bibliography
+============
+
+TODO
 
 
+.. .. 8 pages
+.. Analyse
+.. =======
+.. (key concepts: having a clear understanding of what is going on with visually impaired people)
 
-.. 8 pages
-Analyse
-=======
-(key concepts: having a clear understanding of what is going on with visually impaired people)
-
-State of the art
-understanding the usage (constant talking with VI supervisor Bernard, exploring documentation made about VI)
-scenarios
-tasks modeling
-brainstorming
-
-
-+ interviews, personas
+.. State of the art
+.. understanding the usage (constant talking with VI supervisor Bernard, exploring documentation made about VI)
+.. scenarios
+.. tasks modeling
+.. brainstorming
 
 
-.. 10 pages
-Adapt
-=====
-code engineering (evolutive structure, identifying what is key)
-testing and coverage (how to make sure the whole is still functional if we add change one thing?)
-python (developer friendly)
-versioning (tag previous versions, can come back easily, facilitate open source)
-documenting (why? -> , how?, small remark about comments)
-refactoring (helps understanding the code and the logic better)
-iterative ( )
-polyvalent (3D printing, TUIO, )
-communication skills (two labs, two different views of the final build, different ways: latex, )
-proactive intelligence (explaining why, how: twitter, feedly, reddit)
-planning?
+.. + interviews, personas
 
 
-.. 8 pages
-Justify
-=======
-(key ideas: HCI can be easily countered, tests are ok but eaisly falsiable, but how about we - UX designer create a clear way of justification our work, requires a lot of honesty, but it could be very beneficial and we can have an immediate feeling of how suitable for users the product is, this why I would like to suggest this recap)
+.. .. 10 pages
+.. Adapt
+.. =====
+.. code engineering (evolutive structure, identifying what is key)
+.. testing and coverage (how to make sure the whole is still functional if we add change one thing?)
+.. python (developer friendly)
+.. versioning (tag previous versions, can come back easily, facilitate open source)
+.. documenting (why? -> , how?, small remark about comments)
+.. refactoring (helps understanding the code and the logic better)
+.. iterative ( )
+.. polyvalent (3D printing, TUIO, )
+.. communication skills (two labs, two different views of the final build, different ways: latex, )
+.. proactive intelligence (explaining why, how: twitter, feedly, reddit)
+.. planning?
 
-- why not using dream -> unhappy with software and think it misses the point, yet, it's a good effort towards design justification
-why not purely citing papers -> my opinion is that papers should be referenced for critical stuff, also citing a paper can be misleading. The academics field knows that there is a variety of quality in papers and scholars know how to evaluate it, but how about others? If your work is to be kept in this field, no problem, but if we were to think UX design with an open-source perspective, we will be able to benefit from it only if we make the justifications readable. Citing a paper does not make it readable, it just adds a step of complexity for an idea that could be summarize in one sentence. 
+
+.. .. 8 pages
+.. Justify
+.. =======
+.. (key ideas: HCI can be easily countered, tests are ok but eaisly falsiable, but how about we - UX designer create a clear way of justification our work, requires a lot of honesty, but it could be very beneficial and we can have an immediate feeling of how suitable for users the product is, this why I would like to suggest this recap)
+
+.. - why not using dream -> unhappy with software and think it misses the point, yet, it's a good effort towards design justification
+.. why not purely citing papers -> my opinion is that papers should be referenced for critical stuff, also citing a paper can be misleading. The academics field knows that there is a variety of quality in papers and scholars know how to evaluate it, but how about others? If your work is to be kept in this field, no problem, but if we were to think UX design with an open-source perspective, we will be able to benefit from it only if we make the justifications readable. Citing a paper does not make it readable, it just adds a step of complexity for an idea that could be summarize in one sentence. 
 
 
-.. 8 pages
-Evaluate
-========
-(key idea is that this evaluation phase is for users only)
-user study (iterative, approuved, self testing, real testing, logging)
-informal testing (iterative, various persons, enrich the development, quick enough to be done on the spot -> force you to always have something to show)
-personal critic (okay that one is far fetched, but there is a reason to continue to have a critic eye on one's work, you need )
-statistics
+.. .. 8 pages
+.. Evaluate
+.. ========
+.. (key idea is that this evaluation phase is for users only)
+.. user study (iterative, approuved, self testing, real testing, logging)
+.. informal testing (iterative, various persons, enrich the development, quick enough to be done on the spot -> force you to always have something to show)
+.. personal critic (okay that one is far fetched, but there is a reason to continue to have a critic eye on one's work, you need )
+.. statistics
 
-+ more users? more VI?
+.. + more users? more VI?
