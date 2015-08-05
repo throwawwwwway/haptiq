@@ -102,77 +102,107 @@ class OscillateMapping(HaptiQInteract):
         super().apply()
 
 
-class SimpleGuidance(HaptiQInteract):
+class OscillateGuidance(HaptiQInteract):
     def __init__(self):
         super().__init__()
 
     def process(self):
         self.to_apply = {act: [Behavior([0])] for act in self.device.actuators}
-        prox_nd = None
-        for node in self.view.network.nodes:
-            if State.which(node.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators:
-                    self.to_apply[act].append(Behavior([9]))
-                prox_nd = None
-                break
-            elif node.closer_than(prox_nd, self.device.position):
-                prox_nd = node
-        if prox_nd is not None:
-            state = State.which(prox_nd.distance_to(self.device.position))
-            if state == State.cold:
-                seq = Behavior.gen_oscillation(0, 20, 5)
-            elif state == State.hot:
-                seq = Behavior.gen_oscillation(0, 20, 10)
+        pos = self.device.position
+        node_under = next((nd for nd in self.view.network.nodes if State.which(
+            nd.distance_to(pos)) == State.on), None)
+        if node_under:
+            for lk in self.view.network.links:
+                if State.which(lk.distance_to(pos)) == State.on:
+                    [act] = self.device.actuators_for(lk)
+                    self.to_apply[act].append(Behavior([99]))
+        elif len(self.view.network.links) > 0:
+            cl = None  # closest link
+            for lk in self.view.network.links:
+                if lk.closer_than(cl, pos):
+                    cl = lk
+            if State.which(cl.distance_to(pos)) == State.on:
+                for act in self.device.actuators_for(cl):
+                    self.to_apply[act].append(
+                        Behavior(Behavior.gen_oscillation(0, 90, 10)))
+            elif State.which(cl.distance_to(pos)) == State.hot:
+                self.to_apply[self.device.actuator_to(cl)].append(
+                    Behavior(Behavior.gen_oscillation(0, 20, 10)))
             else:
-                seq = [0]
-            self.to_apply[self.device.actuator_to(prox_nd)].append(
-                Behavior(seq))
-        for link in self.view.network.links:
-            if State.which(link.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators_for(link):
-                    self.to_apply[act].append(Behavior([70]))
+                self.to_apply[self.device.actuator_to(cl)].append(
+                    Behavior([20]))
         super().apply()
 
+# class SimpleGuidance(HaptiQInteract):
+#     def __init__(self):
+#         super().__init__()
 
-class ComplexGuidance(HaptiQInteract):
-    def __init__(self):
-        super().__init__()
+#     def process(self):
+#         self.to_apply = {act: [Behavior([0])] for act in self.device.actuato
+#         prox_nd = None
+#         for node in self.view.network.nodes:
+#             if State.which(node.distance_to(self.device.position)) == State.o
+#                 for act in self.device.actuators:
+#                     self.to_apply[act].append(Behavior([9]))
+#                 prox_nd = None
+#                 break
+#             elif node.closer_than(prox_nd, self.device.position):
+#                 prox_nd = node
+#         if prox_nd is not None:
+#             state = State.which(prox_nd.distance_to(self.device.position))
+#             if state == State.cold:
+#                 seq = Behavior.gen_oscillation(0, 20, 5)
+#             elif state == State.hot:
+#                 seq = Behavior.gen_oscillation(0, 20, 10)
+#             else:
+#                 seq = [0]
+#             self.to_apply[self.device.actuator_to(prox_nd)].append(
+#                 Behavior(seq))
+#         for link in self.view.network.links:
+#             if State.which(link.distance_to(self.device.position)) == Staten:
+#                 for act in self.device.actuators_for(link):
+#                     self.to_apply[act].append(Behavior([70]))
+#         super().apply()
 
-    def process(self):
-        self.to_apply = {
-            act: [Behavior([0])] for act in self.device.actuators}
-        prox_nd = None
-        for node in self.view.network.nodes:
-            if State.which(node.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators:
-                    self.to_apply[act].append(Behavior([9]))
-            elif node.closer_than(prox_nd, self.device.position):
-                prox_nd = node
-        prox_lk = None
-        for link in self.view.network.links:
-            if State.which(link.distance_to(self.device.position)) == State.on:
-                for act in self.device.actuators_for(link):
-                    self.to_apply[act].append(Behavior([70]))
-                prox_lk = None
-                break
-            elif link.closer_than(prox_lk, self.device.position):
-                prox_lk = link
-        if prox_nd is not None:
-            state = State.which(prox_nd.distance_to(self.device.position))
-            if state == State.cold:
-                seq = Behavior.gen_oscillation(0, 20, 5)
-            elif state == State.hot:
-                seq = Behavior.gen_oscillation(0, 20, 10)
-            else:
-                seq = [0]
-            self.to_apply[self.device.actuator_to(prox_nd)].append(
-                Behavior(seq))
-        if prox_lk is not None:
-            state = State.which(prox_lk.distance_to(self.device.position))
-            if state == State.hot:
-                self.to_apply[self.device.actuator_to(prox_lk)].append(
-                    Behavior([79]))
-        super().apply()
+
+# class ComplexGuidance(HaptiQInteract):
+#     def __init__(self):
+#         super().__init__()
+#     def process(self):
+#         self.to_apply = {
+#             act: [Behavior([0])] for act in self.device.actuators}
+#         prox_nd = None
+#         for node in self.view.network.nodes:
+#             if State.which(node.distance_to(self.device.position)) == Staten:
+#                 for act in self.device.actuators:
+#                     self.to_apply[act].append(Behavior([9]))
+#             elif node.closer_than(prox_nd, self.device.position):
+#                 prox_nd = node
+#         prox_lk = None
+#         for link in self.view.network.links:
+#             if State.which(link.distance_to(self.device.position)) == Staten:
+#                 for act in self.device.actuators_for(link):
+#                     self.to_apply[act].append(Behavior([70]))
+#                 prox_lk = None
+#                 break
+#             elif link.closer_than(prox_lk, self.device.position):
+#                 prox_lk = link
+#         if prox_nd is not None:
+#             state = State.which(prox_nd.distance_to(self.device.position))
+#             if state == State.cold:
+#                 seq = Behavior.gen_oscillation(0, 20, 5)
+#             elif state == State.hot:
+#                 seq = Behavior.gen_oscillation(0, 20, 10)
+#             else:
+#                 seq = [0]
+#             self.to_apply[self.device.actuator_to(prox_nd)].append(
+#                 Behavior(seq))
+#         if prox_lk is not None:
+#             state = State.which(prox_lk.distance_to(self.device.position))
+#             if state == State.hot:
+#                 self.to_apply[self.device.actuator_to(prox_lk)].append(
+#                     Behavior([79]))
+#         super().apply()
 
 
 class VoiceInteract(DefaultInteract):

@@ -1,9 +1,54 @@
 from app.network import Node, Link, Network
 from app.actuator import Actuator, Button
-from app.interactions import DefaultInteract, VoiceInteract,\
-    KeyboardInteract, OscillateMapping, SimpleGuidance, ComplexGuidance
+from app.interactions import DefaultInteract, VoiceInteract, KeyboardInteract,\
+    OscillateMapping, OscillateGuidance
 
 # --------------    Networks   --------------
+
+# --------    One connection graph   --------
+
+
+def n():
+    a, b = Node(10, 10), Node(10, 8.5)
+    return Network([a, b], [Link(a, b)])
+
+
+def ne():
+    a, b = Node(10, 10), Node(11, 9)
+    return Network([a, b], [Link(a, b)])
+
+
+def e():
+    a, b = Node(10, 10), Node(11.5, 10)
+    return Network([a, b], [Link(a, b)])
+
+
+def se():
+    a, b = Node(10, 10), Node(11, 11)
+    return Network([a, b], [Link(a, b)])
+
+
+def s():
+    a, b = Node(10, 10), Node(10, 11.5)
+    return Network([a, b], [Link(a, b)])
+
+
+def sw():
+    a, b = Node(10, 10), Node(9, 11)
+    return Network([a, b], [Link(a, b)])
+
+
+def w():
+    a, b = Node(10, 10), Node(8.5, 10)
+    return Network([a, b], [Link(a, b)])
+
+
+def nw():
+    a, b = Node(10, 10), Node(9, 9)
+    return Network([a, b], [Link(a, b)])
+
+
+# --------   Two connections graph   --------
 
 
 def a1():
@@ -220,27 +265,28 @@ def vertical_network():
     return Network([a, b], [Link(a, b)])
 
 
+def l_network():
+    a, b, c = Node(10, 10), Node(10, 8.5), Node(11.5, 10)
+    return Network(
+        [a, b, c],
+        [Link(a, b), Link(a, c)]
+    )
+
+
 def all_networks():
     return {
-        "one node": one_node_network(),
-        "two nodes": two_nodes_network(),
-        "triangle": triangle_network(),
-        "horizontal line": horizontal_network(),
-        "vertical line": vertical_network(),
-        "whole network": whole_network(),
-        "A1": a1(),
-        "A2": a2(),
-        "B1": b1(),
-        "B2": b2(),
-        "C1": c1(),
-        "C2": c2(),
-        "D1": d1(),
-        "D2": d2(),
-        "E1": e1(),
-        "E2": e2(),
-        "F1": f1(),
-        "F2": f2(),
-        "default": Network()
+        # "one node": one_node_network(),
+        # "two nodes": two_nodes_network(),
+        # "triangle": triangle_network(),
+        # "horizontal line": horizontal_network(),
+        # "vertical line": vertical_network(),
+        # "whole network": whole_network(),
+        "default": Network(),
+        "l": l_network(),
+        "gen 0 connection": None,
+        "gen 1 connection": None,
+        "gen 2 connections": None,
+        "gen 3 connections": None
     }
 
 
@@ -290,8 +336,7 @@ def actuators_9():
 def all_interactions():
     return {
         'HaptiQ_oscillate_mapping': OscillateMapping(),
-        'HaptiQ_simple_guidance': SimpleGuidance(),
-        'HaptiQ_complex_guidance': ComplexGuidance(),
+        'HaptiQ_oscillate_guidance': OscillateGuidance(),
         'Voice': VoiceInteract(),
         'Keyboard': KeyboardInteract(),
         'default': DefaultInteract(),

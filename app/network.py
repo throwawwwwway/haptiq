@@ -1,4 +1,5 @@
 import math
+import random
 
 # from app.behavior import Behavior, NodeBehavior, Context
 
@@ -159,3 +160,28 @@ class Network(object):
     def __init__(self, nodes=[], links=[]):
         self.nodes = nodes
         self.links = links
+
+    @staticmethod
+    def generate(nb_connections=0):
+        if nb_connections > 7:
+            raise Exception("Not possible with a center node")
+        possibilities = [
+            Node(10, 8.5), Node(11, 9),
+            Node(11.5, 10), Node(11, 11),
+            Node(10, 11.5), Node(9, 11),
+            Node(8.5, 10), Node(9, 9)
+        ]
+        random.shuffle(possibilities)
+        nodes = [Node(10, 10)]
+        links = []
+        while nb_connections > 0:
+            nodes.append(possibilities.pop())
+            links.append(Link(nodes[0], nodes[-1]))
+            nb_connections -= 1
+        return Network(nodes, links)
+
+    def __str__(self):
+        description = "Network:\n"
+        for link in self.links:
+            description += str(link) + ',\n'
+        return description[:-2]

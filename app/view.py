@@ -4,6 +4,7 @@ import app.logconfig as lc
 from tkinter import Canvas, Menu
 from app.device import Point
 from functools import partial
+from app.network import Network
 
 
 def motion(event, device):
@@ -64,10 +65,15 @@ class View(object):
     def network(self, value):
         self._network = value
         self.scene.draw_network(value)
+        lc.log.info(str(value))
 
     def load_network(self, key):
         lc.log.info("network: {}".format(key))
-        self.network = self.networks[key]
+        if (key[:3] == 'gen'):
+            print(key[4])
+            self.network = Network.generate(int(key[4]))
+        else:
+            self.network = self.networks[key]
 
     @property
     def interaction(self):
