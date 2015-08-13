@@ -166,10 +166,10 @@ class Network(object):
         if nb_connections > 7:
             raise Exception("Not possible with a center node")
         possibilities = [
-            Node(10, 8.5), Node(11, 9),
-            Node(11.5, 10), Node(11, 11),
-            Node(10, 11.5), Node(9, 11),
-            Node(8.5, 10), Node(9, 9)
+            Node(10, 7), Node(12, 8),
+            Node(13, 10), Node(12, 12),
+            Node(10, 13), Node(8, 12),
+            Node(7, 10), Node(8, 8)
         ]
         random.shuffle(possibilities)
         nodes = [Node(10, 10)]

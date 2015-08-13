@@ -22,7 +22,7 @@ class Device(object):
     @position.setter
     def position(self, value):
         if value != self._position:
-            lc.log.info("position: {}".format(str(value)))
+            lc.log.info("position: {}, {}".format(str(value.x), str(value.y)))
             self._position = value
 
     @property

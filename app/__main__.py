@@ -32,7 +32,7 @@ def interact(view):
 
 if __name__ == "__main__":
 
-    DefaultInteract.SIMULATION = True
+    DefaultInteract.SIMULATION = False
 
     device = Device(data.actuators_8())
 
@@ -41,7 +41,7 @@ if __name__ == "__main__":
         device,
         networks=data.all_networks(),
         interacts=data.all_interactions(),
-        mouse_tracking=True,
+        mouse_tracking=False,
         default_network='default',
         default_interact='default'
     )
