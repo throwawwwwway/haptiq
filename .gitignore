@@ -50,3 +50,4 @@ tmp*
 report/gen
 report/*.docx
 log/*
+*.docx
