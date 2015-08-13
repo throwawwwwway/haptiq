@@ -1,10 +1,18 @@
 import serial
 import time
 import os
+import subprocess
 
 import app.logconfig as lc
-# from app.network import Node, Link
+from app.network import Point, Node, Link
 from app.behavior import Behavior, State
+
+direction = {
+    0: "Ouest Este",
+    90: "Nord Sud",
+    45: "Sud Ouest, Nord Este",
+    135: "Nord Ouest, Sud Este"
+}
 
 
 class DefaultInteract(object):
@@ -66,7 +74,8 @@ class HaptiQInteract(DefaultInteract):
                     if not DefaultInteract.SIMULATION:
                         self.ser.write(bytes(msg, 'UTF-8'))
         Behavior._iter += 1
-        lc.log.info(', '.join([str(act) for act in self.device.actuators]))
+        lc.log.info('actuators: ' + ', '.join(
+            [str(act) for act in self.device.actuators]))
         time.sleep(0.2)
 
     def close(self):
@@ -133,77 +142,6 @@ class OscillateGuidance(HaptiQInteract):
                     Behavior([20]))
         super().apply()
 
-# class SimpleGuidance(HaptiQInteract):
-#     def __init__(self):
-#         super().__init__()
-
-#     def process(self):
-#         self.to_apply = {act: [Behavior([0])] for act in self.device.actuato
-#         prox_nd = None
-#         for node in self.view.network.nodes:
-#             if State.which(node.distance_to(self.device.position)) == State.o
-#                 for act in self.device.actuators:
-#                     self.to_apply[act].append(Behavior([9]))
-#                 prox_nd = None
-#                 break
-#             elif node.closer_than(prox_nd, self.device.position):
-#                 prox_nd = node
-#         if prox_nd is not None:
-#             state = State.which(prox_nd.distance_to(self.device.position))
-#             if state == State.cold:
-#                 seq = Behavior.gen_oscillation(0, 20, 5)
-#             elif state == State.hot:
-#                 seq = Behavior.gen_oscillation(0, 20, 10)
-#             else:
-#                 seq = [0]
-#             self.to_apply[self.device.actuator_to(prox_nd)].append(
-#                 Behavior(seq))
-#         for link in self.view.network.links:
-#             if State.which(link.distance_to(self.device.position)) == Staten:
-#                 for act in self.device.actuators_for(link):
-#                     self.to_apply[act].append(Behavior([70]))
-#         super().apply()
-
-
-# class ComplexGuidance(HaptiQInteract):
-#     def __init__(self):
-#         super().__init__()
-#     def process(self):
-#         self.to_apply = {
-#             act: [Behavior([0])] for act in self.device.actuators}
-#         prox_nd = None
-#         for node in self.view.network.nodes:
-#             if State.which(node.distance_to(self.device.position)) == Staten:
-#                 for act in self.device.actuators:
-#                     self.to_apply[act].append(Behavior([9]))
-#             elif node.closer_than(prox_nd, self.device.position):
-#                 prox_nd = node
-#         prox_lk = None
-#         for link in self.view.network.links:
-#             if State.which(link.distance_to(self.device.position)) == Staten:
-#                 for act in self.device.actuators_for(link):
-#                     self.to_apply[act].append(Behavior([70]))
-#                 prox_lk = None
-#                 break
-#             elif link.closer_than(prox_lk, self.device.position):
-#                 prox_lk = link
-#         if prox_nd is not None:
-#             state = State.which(prox_nd.distance_to(self.device.position))
-#             if state == State.cold:
-#                 seq = Behavior.gen_oscillation(0, 20, 5)
-#             elif state == State.hot:
-#                 seq = Behavior.gen_oscillation(0, 20, 10)
-#             else:
-#                 seq = [0]
-#             self.to_apply[self.device.actuator_to(prox_nd)].append(
-#                 Behavior(seq))
-#         if prox_lk is not None:
-#             state = State.which(prox_lk.distance_to(self.device.position))
-#             if state == State.hot:
-#                 self.to_apply[self.device.actuator_to(prox_lk)].append(
-#                     Behavior([79]))
-#         super().apply()
-
 
 class VoiceInteract(DefaultInteract):
     def __init__(self):
@@ -211,9 +149,15 @@ class VoiceInteract(DefaultInteract):
 
     def open(self):
         super().open()
-        self.last_guidance = None
+
+        self.state = 'Idle'
+        self.on_graph_elem = None
+        self.last_position = Point(0, 0)
+        self.current_process = None
+
         try:
-            os.system("say -v Thomas \"Initialization\" &")
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', '"Initialization"'])
         except Exception as e:
             lc.log.warning("Cannot use 'say' command, (not on OSX?): ", e)
             return False
@@ -221,10 +165,42 @@ class VoiceInteract(DefaultInteract):
 
     def process(self):
         # guidance = self.network.text_guidance(self.device.position)
-        guidance = "bel"
-        if self.last_guidance != guidance:
-            return os.system("tput bel") if guidance == "bel" else\
-                os.system("say -v Thomas \"{}\" &".format(guidance))
+        if self.last_position != self.device.position:
+            if self.state == 'Idle':
+                elem_under = self.view.network.what_under(self.device.position)
+                if elem_under:
+                    self.tell_about(elem_under)
+                    self.last_elem_under = elem_under
+                    self.state = 'OnGraph'
+                else:
+                    self.last_elem_under = None
+                    self.state = 'Idle'
+            elif self.state == 'OnGraph':
+                elem_under = self.view.network.what_under(self.device.position)
+                if elem_under and elem_under == self.last_elem_under:
+                    self.state = 'OnGraph'
+                elif elem_under and elem_under != self.last_elem_under:
+                    self.tell_about(elem_under)
+                    self.last_elem_under = elem_under
+                    self.state = 'OnGraph'
+                else:
+                    self.current_process.terminate()
+                    self.last_elem_under = None
+                    self.state = 'Idle'
+        self.last_position = self.device.position
+
+    def tell_about(self, elem):
+        self.current_process.terminate()
+        if type(elem) == Node:
+            speech = "Ici, {}".format(elem.name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
+        elif type(elem) == Link:
+            angle = int(elem.first.angle_with(elem.sec))
+            speech = "Connexion {} ; entre {} et {}".format(
+                direction[angle % 180], elem.first.name, elem.sec.name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
 
     def close(self):
         self.last_guidance = None

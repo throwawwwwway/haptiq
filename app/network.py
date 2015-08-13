@@ -1,7 +1,12 @@
 import math
 import random
 
+from app.behavior import State
+
 # from app.behavior import Behavior, NodeBehavior, Context
+
+fruits = ["Abricot", "Amande", "Ananas", "Avocat", "Banane", "Cassis", "Cerise", "Citron", "Clémentine", "Coing", "Datte", "Figue", "Fraise", "Framboise", "Fruit de la passion", "Grenade", "Groseille", "Kaki", "Kiwi", "Kumquat", "Litchi", "Mandarine", "Mangue", "Marron", "Melon", "Mirabelle", "Mûre", "Myrtille", "Nectarine", "Noisette", "Noix", "Orange", "Pamplemousse", "Papaye", "Pastèque", "Pêche", "Poire", "Pomme", "Prune", "Quetsche", "Raisin", "Reine-claude", "Tomate"]  # noqa
+random.shuffle(fruits)
 
 
 class Point(object):
@@ -93,14 +98,25 @@ class NetworkElem(object):
     def __init__(self):
         pass
 
+    def __eq__(self, other):
+        return (type(self) == type(other) and (
+            self.eq(other)))
+
 
 class Node(Point, NetworkElem):
 
     base_x = 25
     base_y = 25
 
-    def __init__(self, x, y):
+    def __init__(self, x, y, name=None):
+        if name is None:
+            name = fruits.pop()
+        self.name = name
         super().__init__(Node.base_x * x, Node.base_y * y)
+
+    def __eq__(self, other):
+        return type(self) == type(other) and (
+            self.x == other.x and self.y == other.y)
 
     def __str__(self):
         return "Node ({}, {})".format(self.x, self.y)
@@ -116,10 +132,17 @@ class Link(Line, NetworkElem):
 
     def __init__(self, a, b, name=None):
         self.name = name
-        (self.first, self.sec) = (a, b) if a.x <= b.x else (b, a)
+        if a.x < b.x or (a.x == b.x) and (a.y < b.y):
+            (self.first, self.sec) = (a, b)
+        else:
+            (self.first, self.sec) = (b, a)
 
         vector = [self.sec.x - self.first.x, self.sec.y - self.first.y]
         super().__init__(self.first, vector)
+
+    def __eq__(self, other):
+        return type(self) == type(other) and (
+            self.first == other.first and self.sec == other.sec)
 
     def __str__(self):
         return self.name if self.name is not None else\
@@ -161,15 +184,21 @@ class Network(object):
         self.nodes = nodes
         self.links = links
 
+    def __str__(self):
+        description = "Network:\n"
+        for link in self.links:
+            description += str(link) + ',\n'
+        return description[:-2]
+
     @staticmethod
     def generate(nb_connections=0):
         if nb_connections > 7:
             raise Exception("Not possible with a center node")
         possibilities = [
-            Node(10, 8.5), Node(11, 9),
-            Node(11.5, 10), Node(11, 11),
-            Node(10, 11.5), Node(9, 11),
-            Node(8.5, 10), Node(9, 9)
+            Node(10, 7), Node(12, 8),
+            Node(13, 10), Node(12, 12),
+            Node(10, 13), Node(8, 12),
+            Node(7, 10), Node(8, 8)
         ]
         random.shuffle(possibilities)
         nodes = [Node(10, 10)]
@@ -180,8 +209,11 @@ class Network(object):
             nb_connections -= 1
         return Network(nodes, links)
 
-    def __str__(self):
-        description = "Network:\n"
-        for link in self.links:
-            description += str(link) + ',\n'
-        return description[:-2]
+    def what_under(self, pos):
+        node_under = next((nd for nd in self.nodes if State.which(
+            nd.distance_to(pos)) == State.on), None)
+        if node_under:
+            return node_under
+        link_under = next((lk for lk in self.links if State.which(
+            lk.distance_to(pos)) == State.on), None)
+        return link_under

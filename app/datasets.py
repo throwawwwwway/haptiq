@@ -266,7 +266,8 @@ def vertical_network():
 
 
 def l_network():
-    a, b, c = Node(10, 10), Node(10, 8.5), Node(11.5, 10)
+    a = Node(10, 10, 'Paris')
+    b, c = Node(10, 7, 'Lille'), Node(13, 10, 'Strasbourg')
     return Network(
         [a, b, c],
         [Link(a, b), Link(a, c)]
