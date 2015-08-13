@@ -53,6 +53,7 @@ The behavior is following the same behavior as the Mapping one, but adds a guida
 Protocol
 ========
 
+<<<<<<< HEAD
 The subjects were informed about the HaptiQ project and the purpose of this evaluation. They were given a disclaimer to read and sign, before starting the experiment.
 A quick form was then given to check out any familiarities with haptic devices. Before the eye mask is put, they were told that they could leave the experiment at any given time without justification and they also remove the mask if they were feeling uncomfortable.
 

@@ -1,10 +1,18 @@
 import serial
 import time
 import os
+import subprocess
 
 import app.logconfig as lc
-# from app.network import Node, Link
+from app.network import Point, Node, Link
 from app.behavior import Behavior, State
+
+direction = {
+    0: "Ouest Este",
+    90: "Nord Sud",
+    45: "Sud Ouest, Nord Este",
+    135: "Nord Ouest, Sud Este"
+}
 
 
 class DefaultInteract(object):
@@ -141,9 +149,15 @@ class VoiceInteract(DefaultInteract):
 
     def open(self):
         super().open()
-        self.last_guidance = None
+
+        self.state = 'Idle'
+        self.on_graph_elem = None
+        self.last_position = Point(0, 0)
+        self.current_process = None
+
         try:
-            os.system("say -v Thomas \"Initialization\" &")
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', '"Initialization"'])
         except Exception as e:
             lc.log.warning("Cannot use 'say' command, (not on OSX?): ", e)
             return False
@@ -151,10 +165,42 @@ class VoiceInteract(DefaultInteract):
 
     def process(self):
         # guidance = self.network.text_guidance(self.device.position)
-        guidance = "bel"
-        if self.last_guidance != guidance:
-            return os.system("tput bel") if guidance == "bel" else\
-                os.system("say -v Thomas \"{}\" &".format(guidance))
+        if self.last_position != self.device.position:
+            if self.state == 'Idle':
+                elem_under = self.view.network.what_under(self.device.position)
+                if elem_under:
+                    self.tell_about(elem_under)
+                    self.last_elem_under = elem_under
+                    self.state = 'OnGraph'
+                else:
+                    self.last_elem_under = None
+                    self.state = 'Idle'
+            elif self.state == 'OnGraph':
+                elem_under = self.view.network.what_under(self.device.position)
+                if elem_under and elem_under == self.last_elem_under:
+                    self.state = 'OnGraph'
+                elif elem_under and elem_under != self.last_elem_under:
+                    self.tell_about(elem_under)
+                    self.last_elem_under = elem_under
+                    self.state = 'OnGraph'
+                else:
+                    self.current_process.terminate()
+                    self.last_elem_under = None
+                    self.state = 'Idle'
+        self.last_position = self.device.position
+
+    def tell_about(self, elem):
+        self.current_process.terminate()
+        if type(elem) == Node:
+            speech = "Ici, {}".format(elem.name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
+        elif type(elem) == Link:
+            angle = int(elem.first.angle_with(elem.sec))
+            speech = "Connexion {} ; entre {} et {}".format(
+                direction[angle % 180], elem.first.name, elem.sec.name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
 
     def close(self):
         self.last_guidance = None
