@@ -32,7 +32,7 @@ def interact(view):
 
 if __name__ == "__main__":
 
-    DefaultInteract.SIMULATION = False
+    DefaultInteract.SIMULATION = True
 
     device = Device(data.actuators_8())
 
@@ -41,9 +41,9 @@ if __name__ == "__main__":
         device,
         networks=data.all_networks(),
         interacts=data.all_interactions(),
-        mouse_tracking=False,
-        default_network='default',
-        default_interact='default'
+        mouse_tracking=True,
+        default_network='l',
+        default_interact='Keyboard'
     )
 
     # Setting tracking and interacting threadq

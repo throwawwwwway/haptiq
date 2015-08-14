@@ -12,6 +12,15 @@ def motion(event, device):
     device.position = Point(x, y)
 
 
+# def update_pressed_key(event, listener):
+#     listener.update_pressed_key(repr(event.char))
+#     print("pressed {}".format())
+
+
+def focus(event, canvas):
+    canvas.focus_set()
+
+
 def color_from_level(level):
     '''return a hex black depth color depending on the level'''
     intensity = 255 - int(level * 2.55) % 256
@@ -50,7 +59,10 @@ class View(object):
                     self.load_interaction, key)
                 interaction_menu.add_command(
                     label=key, command=partial_command)
-        mouse_tracking = opts['mouse_tracking'] if 'mouse_tracking' in opts else False
+        if 'mouse_tracking' in opts:
+            mouse_tracking = opts['mouse_tracking']
+        else:
+            mouse_tracking = False
         self.scene = Scene(self.root, device, mouse_tracking)
         if 'default_network' in opts:
             self.load_network(opts['default_network'])
@@ -87,6 +99,12 @@ class View(object):
         lc.log.info("interaction: {}".format(key))
         self.interaction = self.interacts[key]
 
+    def activate_key_listening(self, listener):
+        self.scene.activate_key_listening(listener)
+
+    def desactivate_key_listening(self):
+        self.scene.desactivate_key_listening()
+
     def on_exit(self):
         self.root.destroy()
 
@@ -98,7 +116,7 @@ class Scene(object):
     def __init__(self, master, device, mouse_tracking=False):
         self.master = master
         self.device = device
-        self.frame = tk.Frame(self.master)
+        self.frame = tk.Frame(master)
         self.feedbackButton = tk.Button(
             self.frame,
             text="Feedback window",
@@ -119,6 +137,22 @@ class Scene(object):
         self.frame.pack()
         self.app = None
         self.update()
+
+    def activate_key_listening(self, listener):
+        # Will focus frame, needed for key binding
+        self.explore_canvas.bind(
+            "<Button-1>",
+            lambda event,
+            frame=self.explore_canvas: focus(event, frame)
+        )
+        self.explore_canvas.bind(
+            "<Key>",
+            lambda event: listener.update_pressed_key(str(event.char))
+        )
+
+    def desactivate_key_listening(self):
+        self.explore_canvas.unbind("<Button-1>")
+        self.explore_canvas.unbind("<Key>")
 
     def enable_position_feedback(self):
         self.device_cursor = self.explore_canvas.create_oval(
