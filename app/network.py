@@ -110,7 +110,7 @@ class Node(Point, NetworkElem):
 
     def __init__(self, x, y, name=None):
         if name is None:
-            name = fruits.pop()
+            name = fruits.pop(0)
             fruits.append(name)
         self.name = name
         super().__init__(Node.base_x * x, Node.base_y * y)
@@ -218,3 +218,27 @@ class Network(object):
         link_under = next((lk for lk in self.links if State.which(
             lk.distance_to(pos)) == State.on), None)
         return link_under
+
+    def start_node(self):
+        start_node = None
+        for node in self.nodes:
+            if start_node is None or node.y > start_node.y:
+                start_node = node
+        return start_node
+
+    def connected_nodes_to(self, node):
+        connected_nodes = {}
+        for link in self.links:
+            if link.first == node:
+                angle = int(node.angle_with(link.sec))
+                connected_nodes[angle] = link.sec
+            elif link.sec == node:
+                angle = int(node.angle_with(link.first))
+                connected_nodes[angle] = link.first
+        return connected_nodes
+
+    def node_in_direction(self, origin, to):
+        if to in self.connected_nodes_to(origin):
+            return self.connected_nodes_to(origin)[to]
+        else:
+            return None

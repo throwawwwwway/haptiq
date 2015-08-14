@@ -2,16 +2,64 @@ import serial
 import time
 import os
 import subprocess
+import sys
+import tty
+import termios
 
 import app.logconfig as lc
 from app.network import Point, Node, Link
 from app.behavior import Behavior, State
+
+
+class _Getch:
+    """Gets a single character from standard input."""
+    def __init__(self):
+        self.impl = _GetchUnix()
+
+    def __call__(self):
+        return self.impl()
+
+
+class _GetchUnix:
+    def __init__(self):
+        pass
+
+    def __call__(self):
+        fd = sys.stdin.fileno()
+        old_settings = termios.tcgetattr(fd)
+        try:
+            tty.setraw(sys.stdin.fileno())
+            ch = sys.stdin.read(1)
+        finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+        return ch
+
 
 direction = {
     0: "Ouest Este",
     90: "Nord Sud",
     45: "Sud Ouest, Nord Este",
     135: "Nord Ouest, Sud Este"
+}
+angle_to_direction = {
+    0: 'À l\'Est',
+    45: 'Au Nord-Est',
+    90: 'Au Nord',
+    135: 'Au Nord-Ouest',
+    180: 'À l\'Ouest',
+    225: 'Au Sud-Ouest',
+    270: 'Au Sud',
+    315: 'Au Sud-Est'
+}
+key_to_angle = {
+    '1': 225,
+    '2': 270,
+    '3': 315,
+    '4': 180,
+    '6': 0,
+    '7': 135,
+    '8': 90,
+    '9': 45
 }
 
 
@@ -21,6 +69,7 @@ class DefaultInteract(object):
     def __init__(self):
         self.device = None
         self.view = None
+        self.current_process = None
 
     def open(self):
         if self.device is None or self.view is None:
@@ -30,10 +79,29 @@ class DefaultInteract(object):
             return False
 
     def process(self):
-        pass
+        time.sleep(0.2)
 
     def close(self):
         pass
+
+    def tell_about(self, elem):
+        lc.log.info("Someone wants to know about {}".format(str(elem)))
+        if self.current_process is not None:
+            self.current_process.terminate()
+        if type(elem) == Node:
+            speech = "Ici, {}. ".format(elem.name)
+            connections = self.view.network.connected_nodes_to(elem)
+            for angle in connections:
+                speech += "{} {} ; ".format(
+                    angle_to_direction[angle], connections[angle].name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
+        elif type(elem) == Link:
+            angle = int(elem.first.angle_with(elem.sec))
+            speech = "Connexion {} ; entre {} et {}".format(
+                direction[angle % 180], elem.first.name, elem.sec.name)
+            self.current_process = subprocess.Popen(
+                ['say', '-v', 'Thomas', speech])
 
 
 class HaptiQInteract(DefaultInteract):
@@ -153,7 +221,6 @@ class VoiceInteract(DefaultInteract):
         self.state = 'Idle'
         self.on_graph_elem = None
         self.last_position = Point(0, 0)
-        self.current_process = None
 
         try:
             self.current_process = subprocess.Popen(
@@ -188,19 +255,7 @@ class VoiceInteract(DefaultInteract):
                     self.last_elem_under = None
                     self.state = 'Idle'
         self.last_position = self.device.position
-
-    def tell_about(self, elem):
-        self.current_process.terminate()
-        if type(elem) == Node:
-            speech = "Ici, {}".format(elem.name)
-            self.current_process = subprocess.Popen(
-                ['say', '-v', 'Thomas', speech])
-        elif type(elem) == Link:
-            angle = int(elem.first.angle_with(elem.sec))
-            speech = "Connexion {} ; entre {} et {}".format(
-                direction[angle % 180], elem.first.name, elem.sec.name)
-            self.current_process = subprocess.Popen(
-                ['say', '-v', 'Thomas', speech])
+        super().process()
 
     def close(self):
         self.last_guidance = None
@@ -213,16 +268,65 @@ class KeyboardInteract(DefaultInteract):
 
     def open(self):
         super().open()
-        self.last_guidance = None
+        self.state = 'Idle'
+        self.current = None
+        self.last_pressed_char = None
         try:
-            os.system("say -v Thomas \"Initialization\" &")
+            os.system("say -v Thomas \"Interaction clavier\" &")
         except Exception as e:
             lc.log.warning("Cannot use 'say' command, (not on OSX?): ", e)
             return False
+        self.view.activate_key_listening(self)
         return True
 
     def process(self):
-        pass
+        ch = self.last_pressed_char
+        if ch is not None:
+            if self.state == 'Idle':
+                if ch == ' ':  # Start
+                    self.current = self.view.network.start_node()
+                    super().tell_about(self.current)
+                    self.state = 'OnNode'
+            elif self.state == 'OnNode':
+                lc.log.info("OnNode and key pressed: {}".format(ch))
+                if ch in ['1', '2', '3', '4', '6', '7', '8', '9']:
+                    lc.log.info("OnNode and key pressed")
+                    destination = self.view.network.node_in_direction(
+                        self.current, key_to_angle[ch])
+                    if destination is None:  # Invalid move
+                        os.system("say -v Thomas \"Impossible\"")
+                        self.state = 'OnNode'
+                    else:
+                        self.current = destination
+                        super().tell_about(self.current)
+                        self.state = 'OnNode'
+                if ch == 'q':
+                    self.state = 'Idle'
+                if ch == ' ':
+                    super().tell_about(self.current)
+                    self.state = 'OnNode'
+            else:
+                pass  # Illegal
+            self.last_pressed_char = None
+        super().process()
 
     def close(self):
-        pass
+        self.view.desactivate_key_listening()
+
+    def update_pressed_key(self, value):
+        self.last_pressed_char = value
+        lc.log.info("last_pressed_key: {}".format(value))
+
+    # def update_pressed_key(self, pressed_key):
+    #     lc.log.info("Last pressed key is: {}".format(pressed_key))
+    #     self.las
+
+
+def listen_keyboard(interaction):
+    getkey = _Getch()
+    key = None
+    while key != '\x03':
+        key = getkey()
+        interaction.last_key = key
+        time.sleep(0.1)
+    lc.log.info("Quiting keyboard listener elegantly")
