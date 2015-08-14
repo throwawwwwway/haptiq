@@ -111,6 +111,7 @@ class Node(Point, NetworkElem):
     def __init__(self, x, y, name=None):
         if name is None:
             name = fruits.pop()
+            fruits.append(name)
         self.name = name
         super().__init__(Node.base_x * x, Node.base_y * y)
 

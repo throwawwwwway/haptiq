@@ -28,14 +28,18 @@ The behavior is following these rules:
 - When the device is pointing nothing, the actuators are left down.
 
 .. figure:: ressources/m_on_node.png
-   :height: 100px
-   :width: 200px
+   :height: 250px
    :align: center
+   :width: 250px
+
+   Figure 1: Tactile signal when device is pointing to a node
 
 .. figure:: ressources/m_on_link.png
-   :height: 100px
-   :width: 200px
+   :height: 250px
    :align: center
+   :width: 250px
+   
+   Figure 2: Tactile signal when device is pointing to a link
 
 Guidance set of tactile signals
 -------------------------------
@@ -45,15 +49,16 @@ The behavior is following the same behavior as the Mapping one, but adds a guida
 - When the device is near a link, the actuator going towards that link is oscilatting up and down. The rest of the actuators are left down.
 
 .. figure:: ressources/g_near_link.png
-   :height: 100px
-   :width: 200px
+   :height: 250px
+   :width: 250px
    :align: center
+
+   Tactile signal when device is near a link
 
 
 Protocol
 ========
 
-<<<<<<< HEAD
 The subjects were informed about the HaptiQ project and the purpose of this evaluation. They were given a disclaimer to read and sign, before starting the experiment.
 A quick form was then given to check out any familiarities with haptic devices. Before the eye mask is put, they were told that they could leave the experiment at any given time without justification and they also remove the mask if they were feeling uncomfortable.
 
@@ -66,9 +71,9 @@ The graphs used were always a central node in the center of the frame with one, 
 - two graphs with three connections
 
 .. figure:: ressources/possible_graphs.png
-   :height: 100px
-   :width: 200px
-   :align: center
+   :height: 250px
+   :width: 250px
+   :align: aligned-center
 
 They were then asked to fill out a SUS questionnaire and were invited to share their remarks.
 When both of the interaction technique were evaluated, they were then asked to say which would be the most convenient one.
@@ -77,7 +82,8 @@ When both of the interaction technique were evaluated, they were then asked to s
 Data
 ====
 
-t is for time (in ms) and a is for answer (true or false)
+t is for time (in s) and a is for answer (true or false)
+SUS score is out of 100
 Score is 1 for when the set is preferred, 0 otherwise
 Ratio is time inside the network on the total time of the experiment (1 means always on network)
 Distance is the total distance traveled with the device (in px)
@@ -86,29 +92,30 @@ Distance is the total distance traveled with the device (in px)
 On subjects
 -----------
 
-+---------+------+-----+--------------+-------------------+-----------+
-| Subject | Date | Age | Right handed | Haptic experience | Frequency |
-+=========+======+=====+==============+===================+===========+
-| EB      |      |     |              |                   |           |
-+---------+------+-----+--------------+-------------------+-----------+
++---------+------------------+-----+--------+--------------+-------------------+-----------+
+| Subject | Date             | Age | gender | Right handed | Haptic experience | Frequency |
++=========+==================+=====+========+==============+===================+===========+
+| EB      | 06/08/2014 17:44 | 22  | F      | Yes          | Little            | Rare      |
++---------+------------------+-----+--------+--------------+-------------------+-----------+
+
 
 On set M
 --------
 
-+---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+---------+--------------------+
-| Subject | t_M-1 | a_M-1 | t_M-2 | a_M-2 | t_M-2 | a_M-2 | t_M-2 | a_M-2 | t_M-3 | a_M-3 | t_M-3 | a_M-3 | M-SUS | Score | Ratio | Distance | Remarks | Experiment remarks |
-+=========+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+==========+=========+====================+
-| EB      |       |       |       |       |       |       |       |       |       |       |       |       |       |       |       |          |         |                    |
-+---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+---------+--------------------+
++---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+-----------------------------------------------------------------------------------------+--------------------+
+| Subject | t_M-1 | a_M-1 | t_M-2 | a_M-2 | t_M-2 | a_M-2 | t_M-2 | a_M-2 | t_M-3 | a_M-3 | t_M-3 | a_M-3 | M-SUS | Score | Ratio | Distance | Remarks                                                                                 | Experiment remarks |
++=========+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+==========+=========================================================================================+====================+
+| EB      | 111   | True  | 74    | True  | 33    | True  | 105   | True  | 39    | True  | 25    | True  | 85    | 0     | ?     | ?        | Difficult to follow a simple line, better to have a horizontal reference for the handed |                    |
++---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+-----------------------------------------------------------------------------------------+--------------------+
 
 On set G
 --------
 
-+---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+---------+--------------------+
-| Subject | t_G-1 | a_G-1 | t_G-2 | a_G-2 | t_G-2 | a_G-2 | t_G-2 | a_G-2 | t_G-3 | a_G-3 | t_G-3 | a_G-3 | G-SUS | Score | Ratio | Distance | Remarks | Experiment remarks |
-+=========+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+==========+=========+====================+
-| EB      |       |       |       |       |       |       |       |       |       |       |       |       |       |       |       |          |         |                    |
-+---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+---------+--------------------+
++---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+----------------------------------------------+--------------------+
+| Subject | t_G-1 | a_G-1 | t_G-2 | a_G-2 | t_G-2 | a_G-2 | t_G-2 | a_G-2 | t_G-3 | a_G-3 | t_G-3 | a_G-3 | G-SUS | Score | Ratio | Distance | Remarks                                      | Experiment remarks |
++=========+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+=======+==========+==============================================+====================+
+| EB      | 50    | True  | 63    | True  | 80    | True  | 86    | True  | 30    | True  | 49    | False | 92.5  | 1     | ?     | ?        | Same as for M, oscillation should be quicker |                    |
++---------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+-------+----------+----------------------------------------------+--------------------+
 
 
 Results
