@@ -32,6 +32,12 @@ The HaptiQ project aims to design and evaluate an inexpensive haptic device that
 
 I will present in this report the main steps that has led to the creation of this device. I will explain the starting context of the project and the analysing phase; then the design decisions made for this project followed by the way I have implemented them. Finally, I will explain the methods used for the evaluation and an ending discussion about the results and a personal feedback on the skills in human-computer interactions that has been employed for this project.
 
+
+Glossary
+========
+
+TODO
+
 .. 3p
 
 Context
@@ -60,7 +66,7 @@ In order to build and design for visual impairment, user studies and in-field us
 
 
 Work environments
------------------------
+-----------------
 
 The majority of the placement has taken place in the laboratory of IRIT in Toulouse - France. It has been the starting point where I have been immersed in a team fully dedicated towards improving accessibility for visual impairment through various project. 
 
@@ -78,16 +84,75 @@ Produce something that could be easily rebuild
 Produce something that is cheap
 
 
-.. 8p
+.. 8p: 
 
 Analyse
 =======
 
-State of the art
-----------------
+The following chapter presents a state of the art focused on the technologies that could enable exploration of graphs without sight. On a second part it will try to synthesise some knowledge gathered on the way mathematical concepts are taught or shared.
+Making an exhaustive taxonomy would be illusionnary as research related to haptics devices has been diversified since ?? (01__). Yet, this chapter will present the different solutions available for blind people in order to explore through data.
 
-In-field observation
+This background research is based on the doctoral thesis of Thomas_Pietrzak__ on "Dissemination of haptics information in a multimodal environnement" and on the master thesis of Simone__ on "The HaptiQ: A Haptic Device for Graph Exploration by People with Visual Disabilities".
+
+As for in-field observations, I have based my work on the following references: ...
+
+
+.. 6p -> 3000 words
+
+Related work
+------------
+
+In order 
+
+
+Braille (ref needed)
++++++++
+
+The braille is a tactile writing system that has been spreaded over the world since since 1824. Although it could potentially represents some form of graphs with series of dots, arrows, bullets it is intended for reading text. The main issue remains the fact that it is difficult to learn and thinking that all blind people would know it is a common misinformation.
+
+ScreenReaders (ref needed)
++++++++++++++
+
+VIP rely heavily on their audio sens in order to compensate their handicap. This heavy usage would even trigger an "obstacle perception" [95]. ScreenReaders provides an efficient alternative to access text. Several screen readers alternatives are available [#]_.
+If only a few would enable navigation tasks as well like JAWS or VoiceOver from Apple, the main issue remains the usage of audio as a channel for spatial guidance. VIP are not necessarily inclined to use cardinal points neither up, down, right and left as a way of orientation and map exploration through a Screen Reader would require a constant audio feedback. These aspects disqualify this medium as the most suited.
+Besides, it is preferable to interfer with the audio channel as little as possible in order to facilitate the debit of textual information expressed this way.
+
+.. [#] http://alternativeto.net/tag/screen-reader/ (accessed the 19/08/15)
+
+
+Tactile Maps
+++++++++++++
+
+
+
+3D printing
++++++++++++
+
+Dynamic Braille Display
++++++++++++++++++++++++
+
+
+
+
+
+
+
+
+
+
+.. 2p -> 1000 words
+
+General observations
 --------------------
+
+
+Conclusion
+----------
+
+Many alternatives exist, yet the issue remains that we are too focus on the way to represent data more than giving the underlying meaning of them. It might be more relevant to focus on the general trends more than the exact measurment. Let us remember that it is really hard to learn for VIP, the simple knowledge of a squared angle is not easily acquired.
+(ref: 01__)
+
+The following list states the properties to be taken into account. It is a result of these background researchs and gives the direction towards what we want to go.
 
 
 .. 8p
@@ -149,6 +214,12 @@ About the project
 Acquired skills
 ---------------
 
+Remarks
+-------
+
+This report has been generated with RsT, which in my opinion is a technology to keep a close eye on. It is the official technology for Python which is considered to be one of the most developer friendly language because of their philosophy, and this has extended to the way they would create documentation.
+Another thing is that it is open-source and does not require a very complicated setup.
+
 
 
 .. 1p
@@ -175,7 +246,7 @@ yeah sure!
 Bibliography
 ============
 
-TODO
+[95] Vincent LE ́VESQUE : Blindness, technology and haptics. Rapport technique, McGill University, Montre ́al, Que ́bec, Canada, 2005.
 
 
 .. .. 8 pages
