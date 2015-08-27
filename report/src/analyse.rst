@@ -19,17 +19,17 @@ This makes the user centered development process not ideal. Nevertheless, I have
 - A direct contact with X. who was doing his master internship in the cognitive science field has been indicating me the limits of my design when exposed and showed to him
 - Colleagues who have tried a previous version of the HaptiQ uncompleted have warned me about the major issues that they have experienced has users
 
- By these proxies, I was able to come up wit the following task analysis.
+By these proxies, I was able to come up wit the following task analysis.
 
- Giving a blind exploration using only a haptic device and a trained user on the interaction techniques, the task would be decomposed into the following steps:
+Giving a blind exploration using only a haptic device and a trained user on the interaction techniques, the task would be decomposed into the following steps:
 
- 1. Feeling the device
- 2. Moving (depending on a strategy if one) and waiting a feedback
- 3. If there is no tactile feedback, continue moving
- 4. If there is a tactile feedback, processing to understand what is the information encoded this way
- 5. Given the new piece of information acquired, adapt the strategy of exploration
- 6. while exploration is not completed go back to step 2
- 
+1. Feeling the device
+2. Moving (depending on a strategy if one) and waiting a feedback
+3. If there is no tactile feedback, continue moving
+4. If there is a tactile feedback, processing to understand what is the information encoded this way
+5. Given the new piece of information acquired, adapt the strategy of exploration
+6. while exploration is not completed go back to step 2
+
 These steps may seem fairly simple, it actually gives us some clues on the importance of having a very recognisable tactile signal as it plays immensely during the explroation phase.
 
 Another interesting aspect is the fact that an exploration is the result of a sum of strategies. We can consider that finding the network is the first goal then it is to explore all the nodes, which can mean sticking as much as possible to the network. In order to help with these strategies, a solution could be to build tactile signal that would naturally guide for these strategies and confort the users in their choice.
