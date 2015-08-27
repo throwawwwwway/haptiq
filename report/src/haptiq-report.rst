@@ -58,10 +58,7 @@ This report has also been emphasizing the development side of the internship on 
 
 
 
-The work becomes research once the last sentence of the report written. Like, problem we allow people using results, but how about the device itself? Research can also consider the fact of making your project redoable.
-
-
-yeah sure!
+The work becomes research once the last sentence of the report written. Like, problem we allow people using results, but how about the device itself? Research can also consider the fact of making your project redoable.	
 
 Bibliography
 ============
@@ -69,6 +66,7 @@ Bibliography
 [6] Brock, A., Truillet, P., Oriola, B., and Jouffrais, C. Usage of multimodal maps for blind people: why and how. In ACM international conference on interactive tabletops and surfaces (2010), ACM, pp. 247–248.
 [9] Paul Bach-y RITA, Kurt KACZMAREK, Mitchell E. TYLER et Jorge GARCIA-LARA : Form per- ception with a 49-point electrotactile stimulus array on the tongue : a technical note. Journal of Rehabilitation Research Development, 35(4):427–430, 1998.
 [19] Sodhi, R., Poupyrev, I., Glisson, M., and Israr, A. Aireal: interactive tactile experiences in free air. ACM Transactions on Graphics (TOG) 32, 4 (2013), 134.
+[84] GunnarJANSSONetPatrikPEDERSEN:Obtaininggeographicalinformationfromavirtualmap withahapticmouse.DansInternationalCartographicConference,LaCorun ̃a,Spain,juillet2005.
 [88] Roberta L. KLATZKY et Susan J. LEDERMAN : The haptic glance : A route to rapid object identi- fication and manipulation. Attention and Performance XVII. Cognitive regulations of performance : Interaction of theory and application, pages 165–196, 1999.
 [95] Vincent LE ́VESQUE : Blindness, technology and haptics. Rapport technique, McGill University, Montre ́al, Que ́bec, Canada, 2005.
 [101] Jack M. LOOMIS et Susan J. LEDERMAN : K. Boff, L. Kaufman, & J. Thomas (Eds.), Handbook of perception and human performance, chapitre Tactual perception, pages 31–1–31–41. John Wiley & Sons, New York, 1986.
